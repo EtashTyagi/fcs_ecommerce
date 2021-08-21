@@ -1,43 +1,59 @@
 <!DOCTYPE html>
-<html lang="en" translate="no">
+<html lang="en" class="bg-dark">
 <head>
-  <meta charset="UTF-8">
-  <title>FCS | Login To Continue</title>
-  <link rel="stylesheet" type="text/css" href="./css/custom_design.css">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>FCS | Sell</title>
+
+  <!-- Bootstrap -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  <script src="./js/CustomTags.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="./js/bootstrap/bootstrap.min.js"></script>
 </head>
 <header>
+  <nav-header Login></nav-header> <!--CustomTags.js-->
 </header>
-<body class="gradient_animation" style="height: 96vh; width: 96vw">
-  <div class="elevated_container">
-      <span style="font-size: min(8vw, 8vh);
-               border-bottom: solid #121212 2px;
-               color: #121212; display: block;
-               text-align: center">
-          LOGIN
+
+<body>
+<div class="d-flex align-items-center justify-content-center bg-secondary bg-gradient"
+     style="height:calc(100vh - 156px); min-height: 280px">
+  <div class="p-4 d-flex align-items-center justify-content-evenly flex-column card w-75 rounded-3 shadow flex-wrap"
+       style="height: 65%; min-height:250px;max-width: 450px; overflow: hidden">
+      <span style="font-size: xx-large; font-weight: bold">
+          Log-in
       </span>
-    <form style="margin: 3vh 0">
-      <label class="login_container-container">
-        <input class="login_container-elements" type="text" placeholder="Username">
+    <form class="mt-2 d-flex flex-column align-items-center w-100">
+      <label class="w-100 d-flex align-items-center justify-content-center">
+        <input type="text" placeholder="Username" style=" min-width: 25%">
       </label>
-      <label class="login_container-container">
-        <input class="login_container-elements" type="password" placeholder="Password">
+      <label class="w-100 d-flex align-items-center justify-content-center mt-2">
+        <input type="password" placeholder="Password" style=" min-width: 25%">
       </label>
-      <label class="login_container-container">
-        <a href="404"><span style="font-size: min(3vw, 3vh)">Forgot Password</span></a>
+      <label class="mt-1">
+        <a href="404"><span style="font-size: 12px">Forgot Password</span></a>
       </label>
-      <label class="login_container-container">
-        <input style="height: min(1.75vw, 1.75vh)" type="checkbox" name="signed_in" value="signed_in">
-        <span style="font-size: min(3vw, 3vh)">Remember Me</span>
+      <label>
+        <input type="checkbox" name="signed_in" value="signed_in">
+        <span style="font-size: 12px">Remember Me</span>
       </label>
-      <a href="home.html">
-        <label class="login_container-container">
-          <button type="button" class="login_container-elements login_container-login_button">Log In</button>
+      <a class="d-flex flex-column align-items-center mt-2 w-100" href="./home.html" style="text-decoration: none">
+        <label style="max-width: 75%">
+          <button class="btn btn-success" style=" width: 125px; max-width: 100%;" type="button">Log In</button>
         </label>
-        <label class="login_container-container">
-            <button type="button" class="login_container-elements login_container-signup_button">Sign Up</button>
+        <label class="my-2" style="max-width: 75%" >
+          <button class="btn btn-primary" style=" width: 125px; max-width: 100%;" type="button">Sign Up</button>
         </label>
       </a>
     </form>
   </div>
+</div>
+
 </body>
+<footer>
+  <nav-footer Login></nav-footer>
+</footer>
 </html>
