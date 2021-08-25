@@ -113,6 +113,36 @@ class Footer extends HTMLElement {
 </nav>`;
     }
 }
+class ItemCard extends HTMLElement {
+    connectedCallback() {
+        let item = JSON.parse(this.attributes.ofItem.value); // item object
+        this.innerHTML=`
+                <div class="card my-2 mx-1 btn btn-light p-0 text-start" style="max-width: 300px">
+                    <img class="card-img-top" src="${item.image}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">${item.title}</h5>
+                        <p class="card-text">${item.description}</p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">${item.price}$</small>
+                    </div>
+                </div>`
+
+    }
+}
+class Items extends HTMLElement {
+    connectedCallback() {
+        let args = this.attributes.args; // item object Take In Args And call FetchItems
+        let itemList=FetchItems();
+        this.innerHTML=`
+<div class="card-deck d-flex flex-wrap mx-1 mx-sm-2 mx-md-3 mx-lg-4 py-3 justify-content-center">
+    ${itemList.map((element)=>{return `<item-card ofItem='${JSON.stringify(element)}'></item-card>`}).join('')}
+</div>`
+
+    }
+}
 
 customElements.define('nav-header', NavHeader);
 customElements.define('nav-footer', Footer);
+customElements.define('item-card', ItemCard);
+customElements.define('items-display', Items);
