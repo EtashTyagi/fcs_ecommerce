@@ -135,7 +135,7 @@ class Items extends HTMLElement {
         let args = this.attributes.args; // item object Take In Args And call FetchItems
         let itemList=FetchItems();
         this.innerHTML=`
-<div class="card-deck d-flex flex-wrap mx-1 mx-sm-2 mx-md-3 mx-lg-4 py-3 justify-content-center">
+<div class="card-deck d-flex flex-wrap mx-1 mx-sm-2 mx-md-3 mx-lg-4 py-3 justify-content-evenly">
     ${itemList.map((element)=>{return `<item-card ofItem='${JSON.stringify(element)}'></item-card>`}).join('')}
 </div>`
 
