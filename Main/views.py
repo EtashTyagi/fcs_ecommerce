@@ -24,12 +24,20 @@ def sell(request):
     return render(request, 'sell.html')
 
 
+def signup(request):
+    return render(request, 'signup.html')
+
+
+def item(request):
+    return render(request, 'main_item_page.html')
+
 all_views = {
     "admin": {"url": "admin/", "view": admin.site.urls},
     "cart": {"url": "cart/", "view": cart},
     "discounts": {"url": "discounts/", "view": discounts},
     "home": {"url": "", "view": home},
     "login": {"url": "login/", "view": login},
-    "signup": {"url": "signup/", "view": login},
-    "sell": {"url": "sell/", "view": sell}
+    "signup": {"url": "signup/", "view": signup},
+    "sell": {"url": "sell/", "view": sell},
+    "item": {"url": "item/", "view": item}
 }
