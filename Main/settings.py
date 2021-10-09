@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure--pyusjbuve0rh^&*9j-nd)l55sw67l$@^hfy-!1c7zz--ol7s&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1"]
 
 
 # Application definition
@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'Main.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sample',
+        'NAME': 'fcs_ecommerce',
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'USER': 'root',
