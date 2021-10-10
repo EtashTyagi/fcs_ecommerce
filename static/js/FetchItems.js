@@ -43,10 +43,17 @@ const FetchCart = (userID) => {
     }
     return fetchedObjs
 }
-//TODO: Item Wise intake, do server side validation
-const InitiateTransaction = (cost) => {
+//TODO: Item Wise intake, do server side validation, separate code
+const UpdateCart = (itemID_and_qty) => {
 
 }
+
+const InitiateTransaction = (itemID_and_qty) => {
+    UpdateCart(itemID_and_qty);
+
+}
+
+
 
 function makeid(length) {
     let result           = '';

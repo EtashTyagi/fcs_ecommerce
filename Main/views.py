@@ -31,6 +31,10 @@ def signup(request):
 def item(request):
     return render(request, 'main_item_page.html')
 
+
+def checkout(request):
+    return render(request, 'checkout.html')
+
 all_views = {
     "admin": {"url": "admin/", "view": admin.site.urls},
     "cart": {"url": "cart/", "view": cart},
@@ -39,5 +43,6 @@ all_views = {
     "login": {"url": "login/", "view": login},
     "signup": {"url": "signup/", "view": signup},
     "sell": {"url": "sell/", "view": sell},
-    "item": {"url": "item/", "view": item}
+    "item": {"url": "item/", "view": item},
+    "checkout": {"url": "checkout/", "view": checkout}
 }

@@ -41,10 +41,13 @@
             </label>
             <label class="w-100 d-flex mt-3" style="max-width: 410px">
                 <input  min=0.1
-                        max=1000000
+                        max=10000
                         class="w-100" style="max-width: 410px"
                         type = "number"
-                        placeholder="Price">
+                        placeholder="Price"
+                        oninput="if (this.value.length === 0) return;
+                                                 if (this.value > 10000) this.value = this.max;
+                                                 if (this.value < this.min) this.value = this.min;">
             </label>
 
             <a class="d-flex flex-column align-items-center mt-4 w-100" href="/" style="text-decoration: none">
