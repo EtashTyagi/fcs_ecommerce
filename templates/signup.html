@@ -38,33 +38,46 @@
      style="height: 600px; min-height: 280px">
 
     <div class="p-4 d-flex align-items-center flex-column card rounded-3 shadow flex-wrap justify-content-center"
-         style="height: 400px; min-height:250px;min-width: 150px;width: 90%; overflow: hidden; max-width: 500px">
+         style="height: 475px; min-height:250px;min-width: 150px;width: 90%; overflow: hidden; max-width: 500px">
         <span style="font-size: xx-large; font-weight: bold">
             Sign-up
         </span>
-        <form class="mt-4 d-flex flex-column align-items-center w-100 justify-content-center">
+        <form class="mt-4 d-flex flex-column align-items-center w-100 justify-content-center" method="post" id="signup_form">
+            {% csrf_token %}
+            <label class="w-100 d-flex align-items-center justify-content-center mb-3"  style="max-width: 410px">
+                <input type="text" placeholder="Username" name="username" id="username" style="min-width: 100%;max-width: 410px"
+                minlength="8"
+                maxlength="32">
+            </label>
             <label class="d-flex flex-row w-100 justify-content-center">
-                <input class="me-1" type="text" placeholder="First Name" style="width: 50%; max-width: 200px">
-                <input class="ms-1" type="text" placeholder="Second Name" style="width: 50%; max-width: 200px">
+                <input class="me-1" type="text" placeholder="First Name" name="first_name" id="first_name" style="width: 50%; max-width: 200px">
+                <input class="ms-1" type="text" placeholder="Last Name" name="last_name" id="last_name" style="width: 50%; max-width: 200px">
             </label>
             <label class="w-100 d-flex mt-3" style="max-width: 410px">
-                <input type="email" placeholder="Email-ID" style="width: 100%; max-width: 410px">
+                <input type="email" placeholder="Email-ID" name="email" id="email" style="width: 100%; max-width: 410px">
             </label>
             <label class="w-100 d-flex align-items-center justify-content-center mt-3"  style="max-width: 410px">
-                <input type="password" placeholder="Password" style="min-width: 100%;max-width: 410px">
+                <input type="password" placeholder="Password" name="password" id="password" style="min-width: 100%;max-width: 410px"
+                minlength="8"
+                maxlength="32">
+            </label>
+            <label class="w-100 d-flex align-items-center justify-content-center mt-3"  style="max-width: 410px">
+                <input type="password" placeholder="Confirm Password" name="conf_password" id="conf_password" style="min-width: 100%;max-width: 410px"
+                minlength="8"
+                maxlength="32">
             </label>
             <label class="d-flex mt-3" style="max-width: 310px">
                 <input  style="max-width: 310px"
                         oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                         type = "number"
                         maxlength = "10"
-                        placeholder="Mobile">
+                        placeholder="Mobile" name="phone" id="phone">
             </label>
 
             <div class="d-flex flex-column align-items-center mt-4 w-100" >
                 <label style="max-width: 75%">
-                    <a href="/" style="text-decoration: none"><button class="btn btn-success" style="height: 45px;width: 125px; max-width: 100%;" type="button">Continue
-                    </button></a>
+                    <button class="btn btn-success" style="height: 45px;width: 125px; max-width: 100%;" type="submit">Continue
+                    </button>
                 </label>
             </div>
         </form>

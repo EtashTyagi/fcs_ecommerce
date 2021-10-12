@@ -2,7 +2,7 @@
 
 class MainItemDisplay extends HTMLElement {
     connectedCallback() {
-        const item = FetchFullItem(new URL(window.location.href).searchParams.get("id"))
+        const item = JSON.parse(this.attributes.ofItem.value)
         let pos_rating = "", neg_rating = "";
         for (let i = 0; i < Math.min(10, parseInt(item.rating)); i++) {
             pos_rating = pos_rating.concat("⭐")

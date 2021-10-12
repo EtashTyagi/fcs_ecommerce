@@ -4,7 +4,7 @@ class CartItem extends HTMLElement {
     connectedCallback() {
         let item = JSON.parse(this.attributes.ofItem.value)
         let tot_price = (item.price*item.qty).toFixed(3)
-        this.style.width = "450px"
+        this.style.width = "600px"
         this.style.maxWidth = "100%"
         this.style.flexGrow = "2"
         this.classList = "m-2"
@@ -48,22 +48,23 @@ class CartItem extends HTMLElement {
 class CartDisplay extends HTMLElement {
 
     connectedCallback() {
-        const items = FetchCart(69) // Figure a way to put in user id securely (Maybe Cookies)
+        const items = JSON.parse(this.attributes.items.value.replaceAll("'", ""))["d"]
+
         let client_cost = 0;
         items.forEach((key) => {client_cost += key.price * key.qty})
         client_cost = client_cost.toFixed(3)
         this.innerHTML=`
 <form>
         <div class="w-100 d-flex align-items-center justify-content-center my-2">
-        <div class="d-flex flex-column justify-content-center align-items-center my-2 card p-1" style="width: 90%">
-            <span class="h1 card-header w-100 card-title" style="font-size: xxx-large; text-align: center">My Cart</span>
+        <div class="d-flex flex-column justify-content-center align-items-center my-2 card p-1" style="width: 90%; max-width: 1150px">
+            <span class="h1 card-header w-100 card-title text-start" style="font-size: xxx-large; text-align: center">My Cart</span>
             <div>
                 <span class="h1 card-subtitle " style="font-size: xx-large">Total Cost: </span> <span class="h1" style="font-size: xx-large" id="client_cost">${client_cost}</span> <span style="font-size: xx-large" id="client_cost">$</span>
             </div>
             <div class="d-flex flex-row flex-wrap w-100 justify-content-evenly align-stretch mt-3">
                 ${items.map((element)=>{return `<cart-item ofItem='${JSON.stringify(element)}' init_cost="${client_cost}"></cart-item>`}).join('')}
             </div>
-            <button class="btn btn-success my-2" formaction="/checkout">Checkout</button>
+            <button class="btn btn-success my-2 mb-3" style="width: 90%; max-width: 500px" formaction="/checkout">Checkout</button>
         </div>
         </div>
         

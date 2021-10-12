@@ -15,7 +15,6 @@
         <script src="{% static 'js/components/Header.js' %}"></script>
         <script src="{% static 'js/components/Footer.js' %}"></script>
         <script src="{% static 'js/components/ItemsList.js' %}"></script>
-        <script src="{% static 'js/FetchItems.js' %}"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script src="{% static 'js/bootstrap/bootstrap.min.js' %}"></script>
     </head>
@@ -24,7 +23,11 @@
     </header>
     <body >
         <div style="min-height: calc(100vh - 160px); background: antiquewhite">
-            <items-display></items-display> <!-- Put in args here of search, currently random-->
+            <div class="card-deck d-flex flex-wrap mx-1 mx-sm-2 mx-md-3 mx-lg-4 py-3 justify-content-evenly">
+            {% for item in items %}
+                <item-card ofItem='{{ item }}'></item-card>
+            {% endfor %}
+            </div>
         </div>
     </body>
     <footer>
