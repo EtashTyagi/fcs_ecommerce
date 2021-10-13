@@ -65,7 +65,7 @@ def item(request):
     if request.method == "POST":
         return HttpResponse("404 - not found")
 
-    args = {"item": fetchFullItem(request.GET["id"])}
+    args = {"item": fetchFullItem(request.GET["id"][:-1] if request.GET["id"][-1] == '/' else request.GET["id"])}
     return render(request, 'main_item_page.html', args)
 
 

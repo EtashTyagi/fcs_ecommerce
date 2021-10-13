@@ -2,34 +2,43 @@
 import json
 import math
 import random
+from Main.models import Product
 
 
+# Return -1 for invalid request
 def fetchItems(request):
-    # Api Call To Server And More Params like sort by...
+    # TODO params like sort by, name, etc...
     result_fetch = []
-    for i in range(0, 50):
+    for prod in Product.objects.raw('SELECT 1 id, ID, title, image, short_description, price FROM products'):
         result_fetch.append(json.dumps(
             {
-                'ID': random.random() * 10,
-                'image': f'https://picsum.photos/300/200/?random={i}',
-                'title': str(makeid(math.floor(random.random() * 8) + 3)),
-                'short_desc': makeid(math.floor(random.random() * 100) + 100),
-                'price': f'{(random.random()*10):.2f}',
+                'ID': str(prod.ID),
+                'image': prod.image,
+                'title': prod.title,
+                'short_description': prod.short_description,
+                'price': str(prod.price),
                 'rating': str(int(random.random() * 11))
             }))
+
     print(result_fetch)
     return result_fetch
 
 
+# Return -1 for invalid request
 def fetchFullItem(itemID):
-    return json.dumps({
-        'ID': str(random.random() * 10),
-        'image': f'https://picsum.photos/300/200/?random={itemID}',
-        'title': str(makeid(math.floor(random.random() * 8) + 3)),
-        'price': f'{(random.random()*10):.2f}',
-        'rating': str(int(random.random() * 11)),
-        'description': 'The really long description. '*125
-    })
+    query_str = f'SELECT 1 id, title, image, description, price FROM products WHERE products.ID={itemID}'
+    print(query_str)
+    for prod in Product.objects.raw(query_str):
+        return json.dumps({
+            'ID': str(itemID),
+            'image': prod.image,
+            'title': prod.title,
+            'description': prod.description,
+            'price': str(prod.price),
+            'rating': str(int(random.random() * 11))
+        })
+    return -1
+
 
 
 def fetchCart(userID):
@@ -37,12 +46,12 @@ def fetchCart(userID):
     fetched_list = []
     for i in range(0, 4):
         fetched_list.append(json.dumps({
-                'ID': random.random() * 10,
-                'image': f'https://picsum.photos/300/200/?random={i}',
-                'title': str(makeid(math.floor(random.random() * 8) + 3)),
-                'qty': f'{math.ceil(random.random()*10):d}',
-                'price': f'{(random.random() * 10):.2f}'
-            }))
+            'ID': random.random() * 10,
+            'image': f'https://picsum.photos/300/200/?random={i}',
+            'title': str(makeid(math.floor(random.random() * 8) + 3)),
+            'qty': f'{math.ceil(random.random() * 10):d}',
+            'price': f'{(random.random() * 10):.2f}'
+        }))
     return fetched_list
 
 
