@@ -23,39 +23,40 @@
 <body >
 <div class="d-flex align-items-center justify-content-center"
      style="background: antiquewhite; min-height:calc(100vh - 156px)">
-            <form class="mt-4 d-flex flex-column align-items-center w-100 justify-content-center">
+            <form class="mt-4 d-flex flex-column align-items-center w-100 justify-content-center" method="get">
                 <label class="d-flex flex-row w-100 justify-content-center" style="height: 125px">
                     <button class="btn  btn-light me-4" style="width: 50%; max-width: 125px">Upload Image 1</button>
                     <button class="btn btn-light ms-4" style="width: 50%; max-width: 125px">Upload Image 2</button>
                 </label>
 
             <label class="d-flex flex-row w-100 justify-content-center mt-3">
-                <input class="me-1" type="text" placeholder="Product Name" style="width: 50%; max-width: 200px">
-                <input class="ms-1" type="text" placeholder="Product Type" style="width: 50%; max-width: 200px">
+                <input class="me-1" id="name" name="name" type="text" placeholder="Product Name" style="width: 50%; max-width: 200px" required>
+                <input class="ms-1" id="type" name="type" type="text" placeholder="Product Type" style="width: 50%; max-width: 200px" required>
             </label>
             <label class="w-100 d-flex mt-3" style="max-width: 410px">
-                <textarea placeholder="Short Description" class="w-100"></textarea>
+                <textarea id="short_description" name="short_description" placeholder="Short Description" class="w-100"
+                 maxlength="200" required></textarea>
             </label>
                 <label class="w-100 d-flex mt-3" style="max-width: 410px">
-                <textarea placeholder="Long Description" class="w-100"></textarea>
+                <textarea id="description" name="description" placeholder="Long Description" class="w-100"
+                maxlength="5000" required></textarea>
             </label>
             <label class="w-100 d-flex mt-3" style="max-width: 410px">
-                <input  min=0.1
-                        max=10000
+                <input  id="price" name="price"
+                        min=0.01
+                        max=100000000
                         class="w-100" style="max-width: 410px"
                         type = "number"
                         placeholder="Price"
                         oninput="if (this.value.length === 0) return;
-                                                 if (this.value > 10000) this.value = this.max;
-                                                 if (this.value < this.min) this.value = this.min;">
+                                                 if (this.value > 100000000.00) this.value = this.max;
+                                                 if (this.value < this.min) this.value = this.min;" required>
             </label>
 
-            <a class="d-flex flex-column align-items-center mt-4 w-100" href="/" style="text-decoration: none">
-                <label style="max-width: 75%">
-                    <button class="btn btn-success" style="height: 45px;width: 125px; max-width: 100%;" type="button">Send Request
+                <label class="mt-4" style="max-width: 75%">
+                    <button class="btn btn-success" style="height: 45px;width: 125px; max-width: 100%;" type="submit">Send Request
                     </button>
                 </label>
-            </a>
         </form>
 </div>
 </body>

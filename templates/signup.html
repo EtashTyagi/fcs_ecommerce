@@ -46,32 +46,35 @@
             {% csrf_token %}
             <label class="w-100 d-flex align-items-center justify-content-center mb-3"  style="max-width: 410px">
                 <input type="text" placeholder="Username" name="username" id="username" style="min-width: 100%;max-width: 410px"
-                minlength="8"
-                maxlength="32">
+                minlength="4"
+                maxlength="32" required>
             </label>
             <label class="d-flex flex-row w-100 justify-content-center">
-                <input class="me-1" type="text" placeholder="First Name" name="first_name" id="first_name" style="width: 50%; max-width: 200px">
-                <input class="ms-1" type="text" placeholder="Last Name" name="last_name" id="last_name" style="width: 50%; max-width: 200px">
+                <input class="me-1" type="text" placeholder="First Name" name="first_name" id="first_name" style="width: 50%; max-width: 200px" required>
+                <input class="ms-1" type="text" placeholder="Last Name" name="last_name" id="last_name" style="width: 50%; max-width: 200px" required>
             </label>
             <label class="w-100 d-flex mt-3" style="max-width: 410px">
-                <input type="email" placeholder="Email-ID" name="email" id="email" style="width: 100%; max-width: 410px">
+                <input type="email" placeholder="Email-ID" name="email" id="email" style="width: 100%; max-width: 410px" required>
             </label>
+            <script>let fp=""</script>
             <label class="w-100 d-flex align-items-center justify-content-center mt-3"  style="max-width: 410px">
                 <input type="password" placeholder="Password" name="password" id="password" style="min-width: 100%;max-width: 410px"
                 minlength="8"
-                maxlength="32">
+                maxlength="32" onchange="fp=this.value" required>
             </label>
             <label class="w-100 d-flex align-items-center justify-content-center mt-3"  style="max-width: 410px">
                 <input type="password" placeholder="Confirm Password" name="conf_password" id="conf_password" style="min-width: 100%;max-width: 410px"
                 minlength="8"
-                maxlength="32">
+                maxlength="32" oninput="if (fp !== this.value) {this.setCustomValidity('Passwords do not match')} else {this.setCustomValidity('')}" required>
             </label>
             <label class="d-flex mt-3" style="max-width: 310px">
                 <input  style="max-width: 310px"
-                        oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                        oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);
+                                if (this.value.length < this.maxLength) this.setCustomValidity('Phone must be 10 digit long');
+                                if (this.value.length === this.maxLength) this.setCustomValidity('')"
                         type = "number"
                         maxlength = "10"
-                        placeholder="Mobile" name="phone" id="phone">
+                        placeholder="Mobile" name="phone" id="phone" required>
             </label>
 
             <div class="d-flex flex-column align-items-center mt-4 w-100" >
