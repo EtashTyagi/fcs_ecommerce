@@ -11,7 +11,7 @@ class ItemCard extends HTMLElement {
         this.innerHTML=`
             <a href='/item?id=${item.ID}/' style="text-decoration: inherit; color: inherit; cursor: auto;">
                 <div class="card my-2 mx-1 btn btn-outline-light p-0 text-start text-dark" style="width: 350px">
-                    <img class="card-img-top card-img" src="${item.image}" alt="Card image cap" height="233px">
+                    <img class="card-img-top card-img" src="${item.image}" alt="Card image cap" height="233px" style="object-fit: contain">
                     <div class="card-body pb-0">
                         <h5 class="card-title text-truncate">${item.title}</h5>
                         <p class="card-text" style="height: 125px; overflow: hidden;text-overflow: fade">

@@ -15,9 +15,9 @@ class MainItemDisplay extends HTMLElement {
             <div class="d-flex flex-column card my-2 p-0 text-start text-dark flex-md-row
             align-items-center align-items-md-start"
                 style="width: 90%">
-                    <div class="mb-md-2 h-100 mt-2 mt-md-4 px-2 px-md-0 ps-md-2 w-100 d-flex flex-column align-items-center justify-content-center" style="min-width: 300px">
-                        <img class="card-img-top card-img rounded-0 rounded-top" style="max-width: 650px; max-height: 433px; overflow: hidden" src="${item.image}" alt="Card image cap">
-                        <div class="w-100 d-flex flex-row justify-content-around flex-md-column">
+                    <div class="mb-md-2 h-100 mt-2 mt-md-4 px-2 px-md-0 ps-md-2 w-100 d-flex flex-column align-items-center justify-content-center" style="min-width: 300px; max-width: 500px">
+                        <img class="card-img-top card-img rounded-0 rounded-top" style="max-width: 500px; max-height: 300px;object-fit: contain" src="${item.image}" alt="Card image cap">
+                        <div class="w-100 d-flex justify-content-around flex-column">
                             <div class="card-footer d-flex flex-row align-items-center" style="max-height: 36px">
                                 <small class="text-muted"><b>Price:</b></small>
                                 <small class="ms-1">${item.price}</small>
@@ -35,8 +35,8 @@ class MainItemDisplay extends HTMLElement {
                     
                     
                     <div class="card-body pb-0">
-                        <h1 class="card-title text-truncate">${item.title}</h1>
-                        <p class="card-text pb-2">
+                        <h1 class="card-title text-truncate mb-0">${item.title}</h1>
+                        <p class="card-text pb-2 mt-0">
                             ${item.description}
                         </p>
                     </div>
