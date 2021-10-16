@@ -15,21 +15,63 @@
 
     <script src="https://cdn.jsdelivr.net/npm/easyzoom@2.5.3/src/easyzoom.js"></script>
     <script src="{% static 'js/components/Header.js' %}"></script>
-    <script src="{% static 'js/components/Footer.js' %}"></script>
-    <script src="{% static 'js/components/MainItemDisplay.js' %}"></script>
+    <script src="{% static 'js/MakeRating.js' %}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="{% static 'js/bootstrap/bootstrap.min.js' %}"></script>
 </head>
 <header>
-    <nav-header Home Search></nav-header> <!--MainItemDisplay.js-->
+            {% block header %}
+            {% with active="Item"%}
+            {% include 'Header.html' %}
+            {% endwith %}
+        {% endblock header %}
 </header>
-<body >
-<div class="d-flex flex-column align-items-center justify-content-center"
+<body>
+    <div class="d-flex flex-column align-items-center justify-content-center"
      style="background: antiquewhite; min-height:calc(100vh - 156px)">
-    <main-item-display ofItem='{{ item }}'></main-item-display>
+        <div class="w-100 d-flex flex-column justify-content-center align-items-center my-2">
+            <div class="d-flex flex-column card my-2 p-0 pb-2 text-start text-dark flex-md-row
+               align-items-center align-items-md-start"
+                 style="width: 90%">
+                <div class="mb-md-2 h-100 mt-2 mt-md-4 px-2 px-md-0 ps-md-2 w-100 d-flex flex-column align-items-center justify-content-center" style="min-width: 300px; max-width: 500px">
+                    <img src='{{ item.image }}'
+                         class="card-img-top card-img rounded-0 rounded-top" style="max-width: 500px; max-height: 300px;object-fit: contain" id="image" alt="Card image cap">
+                    <div class="w-100 d-flex justify-content-around flex-column">
+                        <div class="card-footer d-flex flex-row align-items-center" style="max-height: 36px">
+                            <small class="text-muted"><b>Price:</b></small>
+                            <small class="ms-1">{{ item.price }}</small>
+                            <span style="font-size: 18px; font-weight: lighter">$</span>
+                        </div>
+                        <div class="card-footer d-flex flex-row align-items-center w-100" style="max-height: 36px; overflow: hidden">
+                            <small class="text-muted"><b>Rating:</b> <span id="pos_rating"></span></small>
+                            <span style="font-size: 24px" id="neg_rating"></span>
+                            <script>
+                                 document.getElementById("pos_rating").innerHTML=makePosRating({{ item.rating }})
+                                 document.getElementById("neg_rating").innerHTML=makeNegRating({{ item.rating }})
+                            </script>
+                        </div>
+                    </div>
+                    <form class="w-100 d-flex flex-row justify-content-around flex-md-column" method="post">
+                        {% csrf_token %}
+                        <button class="btn {% if not user.is_authenticated %}btn-danger{% else %}btn-success{% endif %} mt-2 w-100" type="submit" name="type" value="add_to_cart"
+                        {% if in_cart and user.is_authenticated %}disabled{% endif %}>{% if in_cart %}In Cart{% else %}Add To Cart{% endif %}</button>
+                    </form>
+                </div>
+                <div class="card-body pb-0">
+                    <h1 class="card-title text-truncate mb-0">{{ item.title }}</h1>
+                    <p class="card-text pb-2 mt-0">
+                        {{ item.description|safe }}
+                    </p>
+                </div>
+            </div>
+        </div>
 </div>
 </body>
 <footer>
-    <nav-footer Home></nav-footer>
+        {% block footer %}
+            {% with active="Item" %}
+            {% include 'Footer.html' %}
+            {% endwith %}
+        {% endblock footer %}
 </footer>
 </html>

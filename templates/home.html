@@ -14,23 +14,32 @@
 
         <script src="{% static 'js/components/Header.js' %}"></script>
         <script src="{% static 'js/components/Footer.js' %}"></script>
-        <script src="{% static 'js/components/ItemsList.js' %}"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script src="{% static 'js/bootstrap/bootstrap.min.js' %}"></script>
     </head>
     <header>
-        <nav-header Home Search></nav-header> <!--MainItemDisplay.js-->
+        {% block header %}
+            {% with active="Home"%}
+            {% include 'Header.html' %}
+            {% endwith %}
+        {% endblock header %}
     </header>
     <body >
         <div style="min-height: calc(100vh - 160px); background: antiquewhite">
             <div class="card-deck d-flex flex-wrap mx-1 mx-sm-2 mx-md-3 mx-lg-4 py-3 justify-content-evenly">
             {% for item in items %}
-                <item-card ofItem='{{ item }}'></item-card>
+                {% block content %}
+                    {% include 'item_card.html' %}
+                {% endblock content %}
             {% endfor %}
             </div>
         </div>
     </body>
     <footer>
-        <nav-footer Home></nav-footer>
+        {% block footer %}
+            {% with active="Home" %}
+            {% include 'Footer.html' %}
+            {% endwith %}
+        {% endblock footer %}
     </footer>
 </html>

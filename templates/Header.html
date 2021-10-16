@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <title></title>
+
+        <!-- Bootstrap -->
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="{% static 'js/bootstrap/bootstrap.min.js' %}"></script>
+</head>
+<body>
+<nav class="shadow-sm navbar navbar-expand-md navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">
+        <div class="d-flex align-items-center justify-content-center">
+            <img alt="company Logo" height="32px" src="/static/res/logoPlaceHolder.png">
+            <span class="h-100 ms-1" style="font-weight: 600">FCS</span>
+        </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <li class="nav-item">
+          <a class="nav-link {% if active == "Home" %}active{% endif %}" aria-current="page" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if active == "Discounts" %}active{% endif %}" href="/discounts">Discounts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if active == "Sell" %}active{% endif %}" href="/sell">Sell</a>
+        </li>
+      </ul>
+        {% if active == "Home" or active == "Discounts" or active == "Sell" or active == "Item"%}
+            <form class="d-flex mx-0 mx-md-3 w-100">
+                <select class="form-select p-0 rounded-0 rounded-start select2 select2-search--dropdown btn-success pe-4 ps-2" style="max-width: 90px">
+                        <option value="All">All</option>
+                        <option value="Laptop">Laptop</option>
+                        <option value="Mobile">Mobile</option>
+                </select>
+                <input class="form-control rounded-0 border-0 w-100" type="search" placeholder="Search"
+                       aria-label="Search">
+                <button class="rounded-0 rounded-end btn btn-success" type="submit">Search</button>
+            </form>
+        {% else %}
+            <div class="d-flex mx-0 mx-md-3 w-100">
+            </div>
+        {% endif %}
+      <div class="d-flex flex-row me-auto mb-2 mb-md-0">
+        <div class="nav-item dropdown pt-2 pt-md-0">
+            <a class="dropdown-toggle btn {% if active == "Login" %}active{% endif %} link-primary ps-md-2" href="#" id="login" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <img class="rounded-circle" height="28px" src="https://clinicforspecialchildren.org/wp-content/uploads/2016/08/avatar-placeholder.gif" alt="User"/>
+            </a>
+        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-md-end" aria-labelledby="login">
+            {% if not user.is_authenticated %}
+                <li><a class="dropdown-item" href="/login">Login</a></li>
+                <li><a class="dropdown-item" href="/signup">Signup</a></li>
+            {% else %}
+                <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            {% endif %}
+        </ul>
+        </div>
+        <div class="nav-item dropdown pt-2 pt-md-0 ms-1">
+            <div class="btn {% if active == "Cart" %}active{% endif %}">
+                <a href="/cart" id="login" role="button" aria-expanded="false">
+                    <img class="rounded-circle" height="28px" src="/static/res/cartIcon.png" alt="Cart"/>
+                </a>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+</body>
+</html>

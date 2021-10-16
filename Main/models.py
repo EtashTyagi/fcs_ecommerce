@@ -8,3 +8,4 @@ class Product(models.Model):
     description = models.CharField(max_length=5000)
     price = models.DecimalField(max_digits=13, decimal_places=2)
     image = models.CharField(max_length=1000)
+    quantity = models.IntegerField()  # For item stock and cart qty
