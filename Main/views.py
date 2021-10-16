@@ -10,6 +10,7 @@ from Main.auth_handler import *
 
 
 def home(request):
+    request.session.pop('login_to_continue_to', None)
     if request.method == "POST":
         return HttpResponse("404 - not found")
 
@@ -18,6 +19,7 @@ def home(request):
 
 
 def cart(request):
+    request.session.pop('login_to_continue_to', None)
     if request.method == "POST":
         return HttpResponse("404 - not found")
 
@@ -25,11 +27,12 @@ def cart(request):
         args = {"items": fetchCart(request.user)}
         return render(request, 'cart.html', args)
     else:
-        request.session['login_to_continue'] = True
+        request.session['login_to_continue_to'] = "/cart"
         return redirect('/login/')
 
 
 def discounts(request):
+    request.session.pop('login_to_continue_to', None)
     if request.method == "POST":
         return HttpResponse("404 - not found")
 
@@ -47,20 +50,23 @@ def login(request):
             args["red"] = True
             args["message"] = "Wrong Credentials"
         else:
-            return redirect('/')
+            rd_path = "/"
+            if 'login_to_continue_to' in request.session.keys():
+                rd_path = request.session['login_to_continue_to']
+            return redirect(rd_path)
     if 'redirect_from_signup' in request.session.keys():
         args["green"] = True
         args["message"] = "Sign-up Successful"
         request.session.pop('redirect_from_signup')
-    if 'login_to_continue' in request.session.keys():
+    if 'login_to_continue_to' in request.session.keys():
         args["green"] = True
         args["message"] = "Log-in To Continue"
-        request.session.pop('login_to_continue')
 
     return render(request, 'login.html', args)
 
 
 def sell(request):
+    request.session.pop('login_to_continue_to', None)
     if request.method == "POST":
         return HttpResponse("404 - not found")
 
@@ -68,6 +74,7 @@ def sell(request):
 
 
 def signup(request):
+    request.session.pop('login_to_continue_to', None)
     args = {"failed": False}
     if request.user.is_authenticated:
         return redirect('/')
@@ -87,31 +94,40 @@ def signup(request):
 
 
 def item(request):
+    request.session.pop('login_to_continue_to', None)
+    args = {"item": fetchFullItem(request.GET["id"][:-1] if request.GET["id"][-1] == '/' else request.GET["id"])}
+    args["in_cart"] = is_in_cart(request.user, args["item"]["ID"]) if request.user.is_authenticated else False
+
     if request.method == "POST":
         if request.POST["type"] == "add_to_cart":
             product_id = request.GET["id"][:-1] if request.GET["id"][-1] == '/' else request.GET["id"]
-            if not is_in_cart(request.user, product_id):
+            if not request.user.is_authenticated:
+                request.session['login_to_continue_to'] = f'/item/?id={product_id}'
+                print(request.path)
+                return redirect('/login/')
+            elif not args["in_cart"]:
                 add_to_cart(request.user, product_id)
 
-    args = {"item": fetchFullItem(request.GET["id"][:-1] if request.GET["id"][-1] == '/' else request.GET["id"])}
-    args["in_cart"] = is_in_cart(request.user, args["item"]["ID"]) if request.user.is_authenticated else False
     return render(request, 'main_item_page.html', args)
 
 
 # TODO: Extremely important, validate if can checkout (stock, positive items, ....)
 def checkout(request):
+    request.session.pop('login_to_continue_to', None)
     return render(request, 'checkout.html')
 
 
 def profile(request):
+    request.session.pop('login_to_continue_to', None)
     if request.user.is_authenticated:
         return HttpResponse("Profile")
     else:
-        request.session['login_to_continue'] = True
+        request.session['login_to_continue_to'] = '/profile'
         return redirect('/login/')
 
 
 def logout(request):
+    request.session.pop('login_to_continue_to', None)
     logout_user(request)
     return redirect("/")
 

@@ -31,8 +31,8 @@
                 <span style="font-size: 18px; font-weight: lighter">$</span>
             </div>
             <div class="card-footer d-flex flex-row align-items-center" style="max-height: 36px">
-                <small class="text-muted"><b>Rating:</b> <span id="pos_rating_{{ item.ID }}"></span></small>
-                    <span style="font-size: 24px" id="neg_rating_{{ item.ID }}"></span>
+                <small class="text-muted"><b>Rating:</b> <span id="pos_rating_{{ item.ID }}" style="font-family: 'Times New Roman'"></span></small>
+                    <span style="font-size: 24px; font-family: 'Times New Roman'" id="neg_rating_{{ item.ID }}"></span>
                     <script>
                          document.getElementById("pos_rating_{{ item.ID }}").innerHTML=makePosRating({{ item.rating }})
                          document.getElementById("neg_rating_{{ item.ID }}").innerHTML=makeNegRating({{ item.rating }})

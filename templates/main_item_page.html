@@ -57,8 +57,8 @@
                         {% if in_cart and user.is_authenticated %}disabled{% endif %}>{% if in_cart %}In Cart{% else %}Add To Cart{% endif %}</button>
                     </form>
                 </div>
-                <div class="card-body pb-0">
-                    <h1 class="card-title text-truncate mb-0">{{ item.title }}</h1>
+                <div class="card-body pb-0 overflow-hidden">
+                    <h1 class="card-title text-truncate mb-0" style="white-space: initial;">{{ item.title }}</h1>
                     <p class="card-text pb-2 mt-0">
                         {{ item.description|safe }}
                     </p>
