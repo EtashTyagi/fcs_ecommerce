@@ -29,7 +29,7 @@
     {% if user.is_authenticated %}
         <form>
             <div class="w-100 d-flex align-items-center justify-content-center my-2">
-            <div class="d-flex flex-column justify-content-center align-items-center my-2 card p-1" style="width: 90%; max-width: 1150px">
+            <div class="d-flex flex-column justify-content-center align-items-center my-2 card" style="width: 90%; max-width: 1150px">
                 <span class="h1 card-header w-100 card-title text-start" style="font-size: xxx-large; text-align: center">My Cart</span>
                 <div>
                     <span class="h1 card-subtitle " style="font-size: xx-large">Total Cost: </span> <span class="h1" style="font-size: xx-large" id="client_cost"></span> <span style="font-size: xx-large" id="client_cost">$</span>
@@ -55,9 +55,9 @@
                                     </div>
 
                                 </div>
-                                <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center" style="min-width: 300px; overflow: hidden">
+                                <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center" style="width: 250px">
                                     <div class="card-body p-0 w-100 ps-2 d-flex flex-column" style="overflow: hidden">
-                                        <span class="card-title h2" style="font-size: xx-large; min-height: 50px; text-overflow: ellipsis;white-space: nowrap;overflow: hidden">{{ item.title }}</span>
+                                        <span class="card-title h2" style="font-size: xx-large; min-height: 50px;white-space: initial">{{ item.title }}</span>
 
                                             <input id="n_items_{{ item.ID }}"
                                                 min=1
