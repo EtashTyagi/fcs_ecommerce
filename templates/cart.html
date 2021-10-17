@@ -27,7 +27,8 @@
 <div class="d-flex flex-column {% if not user.is_authenticated %}align-items-center justify-content-center{% endif %}"
      style="background: antiquewhite; min-height:calc(100vh - 156px)">
     {% if user.is_authenticated %}
-        <form>
+        <form method="post">
+            {% csrf_token %}
             <div class="w-100 d-flex align-items-center justify-content-center my-2">
             <div class="d-flex flex-column justify-content-center align-items-center my-2 card" style="width: 90%; max-width: 1150px">
                 <span class="h1 card-header w-100 card-title text-start" style="font-size: xxx-large; text-align: center">My Cart</span>
@@ -43,7 +44,7 @@
                             <div class="d-flex card p-0 text-start text-dark flex-row align-items-start justify-content-center p-1 pe-2 w-100 flex-wrap" style="background:rgba(0,0,0, 0.02);overflow: hidden">
                                 <div class="flex-grow-0 h-100 px-2 d-flex flex-column align-items-center justify-content-center" style="width: 300px">
                                     <a href="/item?id={{ item.ID }}/">
-                                        <img class="card-img-top card-img rounded-0 rounded-top" height="200px" width="300px" style="object-fit: contain" src='{{ item.image }}' alt={{ item.title }}>
+                                        <img class="card-img-top card-img rounded-0 rounded-top" height="200px" width="300px" style="object-fit: contain" src='{{ item.image }}' alt='{{ item.title }}'>
                                     </a>
                                     <div class="card-footer d-flex flex-row align-items-center" style="width:300px; max-height: 36px;overflow: hidden">
                                         <small class="text-muted"><b>Cost:</b></small>
@@ -58,7 +59,6 @@
                                 <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center" style="width: 250px">
                                     <div class="card-body p-0 w-100 ps-2 d-flex flex-column" style="overflow: hidden">
                                         <span class="card-title h2" style="font-size: xx-large; min-height: 50px;white-space: initial">{{ item.title }}</span>
-
                                             <input id="n_items_{{ item.ID }}"
                                                 min=1
                                                 max=99
@@ -74,15 +74,14 @@
                                                          let prev_tot = parseFloat(document.getElementById('client_cost').innerHTML)
                                                          set_client_cost(prev_tot + user_side_price - prev)"
                                                          >
-
-                                            <button class="btn btn-danger my-2 w-100" onclick="">Remove</button>
+                                            <button class="btn btn-danger my-2 w-100" name="remove_from_cart" value="{{ item.ID }}" type="submit">Remove</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
-                <button class="btn btn-success my-2 mb-3" style="width: 90%; max-width: 500px" formaction="/checkout">Checkout</button>
+                <button class="btn btn-success my-2 mb-3" style="width: 90%; max-width: 500px">Checkout</button>
             </div>
             </div>
         </form>

@@ -2,58 +2,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>FCS | Checkout</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <title>FCS | Checkout</title>
 
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="{% static 'bootstrap/bootstrap.min.js' %}"></script>
+        <!-- Bootstrap -->
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="{% static 'js/bootstrap/bootstrap.min.js' %}"></script>
+        <style>
+            input::-webkit-outer-spin-button,
+            input::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            input[type=number] {
+                -moz-appearance: textfield;
+            }
+        </style>
 </head>
-<body style="background: antiquewhite">
+<body style="background: antiquewhite; min-height: 99vh">
 <div class="w-100 d-flex align-items-center justify-content-center my-3">
-    <div class="card d-flex flex-column pb-3 align-items-center" style="width: 90%; max-width: 1150px">
+    <div class="card d-flex flex-column pb-3 align-items-center" style="width: 90%; max-width: 1100px">
         <span class="h1 card-header w-100" style="font-size: xxx-large">Checkout</span>
 
-        <form class="form d-flex flex-row flex-wrap justify-content-between w-100">
+        <form class="w-100 d-flex flex-column align-items-center justify-content-center">
+            <div class="form d-flex flex-row flex-wrap justify-content-between w-100">
             <div class="d-flex flex-column w-100" style="max-width: 540px;">
                 <span class="h1 p-2 pb-0 mt-2" style="font-size: xx-large">Address</span>
-                <label class="d-flex flex-column overflow-hidden ms-2">
-                    <span class="ms-2" style="font-size: large; font-weight: 600">Country/Region:</span>
-                    <select class="form-select ms-2" style=" width: 95%; max-width: 500px">
+                <label class="d-flex flex-column overflow-hidden mx-2">
+                    <span class="mx-2" style="font-size: large; font-weight: 600">Country/Region:</span>
+                    <select class="form-select mx-2" style=" width: 95%; max-width: 500px" required>
                         <option value="India">India</option>
                         <option value="USA">USA</option>
                     </select>
                 </label>
-                <label class="d-flex flex-column overflow-hidden ms-2 mt-2">
-                    <span class="ms-2" style="font-size: large; font-weight: 600">Full name (First and Last name):</span>
-                    <input type="text" class="mx-2" style="max-width: 500px; width: 95%">
+                <label class="d-flex flex-column overflow-hidden mx-2 mt-2">
+                    <span class="mx-2" style="font-size: large; font-weight: 600">Full name (First and Last name):</span>
+                    <input type="text" class="mx-2" style="max-width: 500px; width: 95%" required>
                 </label>
-                <label class="d-flex flex-column overflow-hidden ms-2 mt-2">
-                    <span class="ms-2" style="font-size: large; font-weight: 600">Registered Phone Number:</span>
-                    <input  class="ms-2" style="width: 95%; max-width: 500px"
+                <label class="d-flex flex-column overflow-hidden mx-2 mt-2">
+                    <span class="mx-2" style="font-size: large; font-weight: 600">Registered Phone Number:</span>
+                    <input  class="mx-2" style="width: 95%; max-width: 500px"
                             oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                            type = "text"
-                            maxlength = "10">
+                            type = "number"
+                            maxlength = "10" required>
                 </label>
-                <label class="d-flex flex-column overflow-hidden ms-2 mt-2">
-                    <span class="ms-2" style="font-size: large; font-weight: 600">House Address:</span>
+                <label class="d-flex flex-column overflow-hidden mx-2 mt-2">
+                    <span class="mx-2" style="font-size: large; font-weight: 600">House Address:</span>
                     <label class="d-flex flex-row">
-                        <input  type="text" class="ms-2" style="width: 46.5%; max-width: 246px" placeholder="house, floor, building">
-                        <input  type="text" class="ms-2" style="width: 46.8%; max-width: 247px" placeholder="street address or PO box">
+                        <input  type="text" class="mx-1 ms-2" style="width: 46.3%; max-width: 245px" placeholder="house, floor, building" required>
+                        <input  type="text" class="mx-2" style="width: 46.3%; max-width: 245px" placeholder="street address or PO box" required>
                     </label>
                 </label>
-                <label class="d-flex flex-row overflow-hidden ms-2 mt-2">
+                <label class="d-flex flex-row overflow-hidden mx-2 mt-2">
                     <label class="d-flex flex-column">
-                        <span class="ms-2" style="font-size: medium; font-weight: 500">City:</span>
-                        <input  type="text" class="ms-2" style="width: 90%; max-width: 170px">
+                        <span class="mx-2" style="font-size: medium; font-weight: 500">City:</span>
+                        <input  type="text" class="ms-2" style="width: 89%; max-width: 168px" required>
                     </label>
                     <label class="d-flex flex-column">
-                        <span class="ms-2" style="font-size: medium; font-weight: 500">State:</span>
-                        <input  type="text" class="ms-2" style="width: 90%; max-width: 170px">
+                        <span class="mx-2" style="font-size: medium; font-weight: 500">State:</span>
+                        <input  type="text" class="ms-2" style="width: 89%; max-width: 168px" required>
                     </label>
                     <label class="d-flex flex-column">
-                        <span class="ms-2" style="font-size: medium; font-weight: 500">ZIP Code:</span>
-                        <input  type="text" class="ms-2" style="width: 86%; max-width: 162px">
+                        <span class="mx-2" style="font-size: medium; font-weight: 500">ZIP Code:</span>
+                        <input  type="number" class="ms-2" style="width: 86%; max-width: 162px" required>
                     </label>
                 </label>
 
@@ -61,24 +77,24 @@
 
             <div class="d-flex flex-column w-100" style="max-width: 540px;">
                 <span class="h1 p-2 pb-0 mt-2" style="font-size: xx-large">Payment Options</span>
-                <label class="d-flex flex-column overflow-hidden ms-2">
-                <span class="ms-2" style="font-size: large; font-weight: 600">Payment Type:</span>
-                <select class="form-select ms-2" style=" width: 95%; max-width: 500px">
+                <label class="d-flex flex-column overflow-hidden mx-2">
+                <span class="mx-2" style="font-size: large; font-weight: 600">Payment Type:</span>
+                <select class="form-select mx-2" style=" width: 95%; max-width: 500px" required>
                     <option value="credit">Debit Card</option>
                 </select>
             </label>
-            <label class="d-flex flex-column overflow-hidden ms-2 mt-2">
-                <span class="ms-2" style="font-size: large; font-weight: 600">Card Number:</span>
-                <input type="text" class="mx-2" style="max-width: 500px; width: 95%">
+            <label class="d-flex flex-column overflow-hidden mx-2 mt-2">
+                <span class="mx-2" style="font-size: large; font-weight: 600">Card Number:</span>
+                <input type="text" class="mx-2" style="max-width: 500px; width: 95%" required>
             </label>
-            <label class="d-flex flex-column overflow-hidden ms-2 mt-2">
-                <span class="ms-2" style="font-size: large; font-weight: 600">Name on Card:</span>
-                <input type="text" class="mx-2" style="max-width: 500px; width: 95%">
+            <label class="d-flex flex-column overflow-hidden mx-2 mt-2">
+                <span class="mx-2" style="font-size: large; font-weight: 600">Name on Card:</span>
+                <input type="text" class="mx-2" style="max-width: 500px; width: 95%" required>
             </label>
-            <label class="d-flex flex-column overflow-hidden ms-2 mt-2">
-                <span class="ms-2" style="font-size: large; font-weight: 600">Expiration Date:</span>
+            <label class="d-flex flex-column overflow-hidden mx-2 mt-2">
+                <span class="mx-2" style="font-size: large; font-weight: 600">Expiration Date:</span>
                 <label class="d-flex flex-row">
-                    <select class="form-select ms-2" style=" width: 46.5%; max-width: 246px">
+                    <select class="form-select mx-2" style=" width: 46.5%; max-width: 246px" required>
                         <option value="credit">1</option>
                         <option value="credit">2</option>
                         <option value="credit">3</option>
@@ -92,7 +108,7 @@
                         <option value="credit">11</option>
                         <option value="credit">12</option>
                     </select>
-                    <select class="form-select ms-2" style=" width: 46.5%; max-width: 247px">
+                    <select class="form-select mx-2" style=" width: 46.5%; max-width: 247px" required>
                         <option value="credit">2021</option>
                         <option value="credit">2022</option>
                         <option value="credit">2023</option>
@@ -117,14 +133,15 @@
                     </select>
                 </label>
             </label>
-            <label class="d-flex flex-column overflow-hidden ms-2 mt-2">
-                <span class="ms-2" style="font-size: large; font-weight: 600">CVV:</span>
-                <input type="text" class="mx-2" style="max-width: 500px; width: 95%">
+            <label class="d-flex flex-column overflow-hidden mx-2 mt-2">
+                <span class="mx-2" style="font-size: large; font-weight: 600">CVV:</span>
+                <input type="number" class="mx-2" style="max-width: 500px; width: 95%" required>
             </label>
 
             </div>
+            </div>
+            <button class="btn btn-success mt-4 mb-2" style="width: 95%; max-width: 200px" type="submit">Continue</button>
         </form>
-        <button class="btn btn-success mt-3" style="width: 95%; max-width: 200px">Continue</button>
     </div>
 </div>
 </body>

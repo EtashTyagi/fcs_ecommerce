@@ -6,7 +6,7 @@ import random
 from Main.models import Product
 
 
-# Return -1 for invalid request
+# Return None for invalid request
 def fetchItems(request):
     # TODO params like sort by, name, etc...
     result_fetch = []
@@ -22,7 +22,7 @@ def fetchItems(request):
     return result_fetch
 
 
-# Return -1 for invalid request
+# Return None for invalid request
 def fetchFullItem(itemID):
     for prod in Product.objects.raw('SELECT 1 id, title, image, description, price FROM products WHERE products.ID=%s',
                                     [itemID]):
@@ -34,7 +34,7 @@ def fetchFullItem(itemID):
             'price': str(prod.price),
             'rating': str(int(random.random() * 11))
         }
-    return -1
+    return None
 
 
 def makeid(length):

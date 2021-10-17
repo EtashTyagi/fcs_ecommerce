@@ -7,7 +7,7 @@ from Main.models import Product
 def fetchCart(user):
     fetched_list = []
     for prod in Product.objects.raw(
-            'SELECT 1 id, ID, title, image, price, quantity FROM (cart INNER JOIN products ON (products.ID=cart.product_id)) WHERE user_id=%s',
+            'SELECT 1 id, ID, title, image, price, quantity FROM (SELECT * FROM cart WHERE user_id = %s) as my_cart INNER JOIN products ON my_cart.product_id = products.ID;',
             [user.id]):
         fetched_list.append({
             'ID': str(prod.ID),
@@ -31,6 +31,10 @@ def add_to_cart(user, productID):
     with connection.cursor() as cursor:
         cursor.execute("INSERT INTO cart VALUES (%s, %s, %s)", [user.id, productID, 1])
 
+
+def remove_from_cart(user, productID):
+    with connection.cursor() as cursor:
+        cursor.execute("DELETE FROM cart where user_id=%s and product_id=%s;", [user.id, productID])
 
 # TODO: Item Wise intake, do server side validation, separate code
 def UpdateCart(itemID_and_qty):
