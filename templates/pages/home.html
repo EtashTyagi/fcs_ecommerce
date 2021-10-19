@@ -9,15 +9,17 @@
         <title>FCS | Home</title>
 
         <!-- Bootstrap -->
-        
         <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="{% static 'js/MakeRating.js' %}"></script>
+        <script src="{% static 'js/bootstrap/jquery-3.2.1.slim.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap/popper.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap/bootstrap_4.min.js' %}"></script>
         <script src="{% static 'js/bootstrap/bootstrap.min.js' %}"></script>
     </head>
     <header>
         {% block header %}
             {% with active="Home"%}
-            {% include 'Header.html' %}
+            {% include 'Components/Header.html' %}
             {% endwith %}
         {% endblock header %}
     </header>
@@ -26,7 +28,7 @@
             <div class="card-deck d-flex flex-wrap mx-2 py-3 justify-content-center">
             {% for item in items %}
                 {% block content %}
-                    {% include 'item_card.html' %}
+                    {% include 'Components/item_card.html' %}
                 {% endblock content %}
             {% endfor %}
             </div>
@@ -35,7 +37,7 @@
     <footer>
         {% block footer %}
             {% with active="Home" %}
-            {% include 'Footer.html' %}
+            {% include 'Components/Footer.html' %}
             {% endwith %}
         {% endblock footer %}
     </footer>
