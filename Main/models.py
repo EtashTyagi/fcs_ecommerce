@@ -9,3 +9,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=13, decimal_places=2)
     image = models.CharField(max_length=1000)
     quantity = models.IntegerField()  # For item stock and cart qty
+
+    def __str__(self):
+        return self.title
+    

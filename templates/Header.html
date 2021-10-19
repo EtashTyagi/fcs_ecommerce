@@ -44,9 +44,48 @@
                         <option value="Laptop">Laptop</option>
                         <option value="Mobile">Mobile</option>
                 </select>
-                <input class="form-control rounded-0 border-0 w-100" type="search" placeholder="Search"
+                {% comment %} <input class="form-control rounded-0 border-0 w-100" type="search" placeholder="Search"
                        aria-label="Search">
-                <button class="rounded-0 rounded-end btn btn-success" type="submit">Search</button>
+                <button class="rounded-0 rounded-end btn btn-success" type="submit">Search</button> {% endcomment %}
+                {% comment %} Added script for autocomplete {% endcomment %}
+        <div id="autocomplete" class="autocomplete">
+        <input class="autocomplete-input" />
+        <ul class="autocomplete-result-list"></ul>
+        </div>
+        <script src="https://unpkg.com/@trevoreyre/autocomplete-js"></script>
+        <script> new Autocomplete('#autocomplete', {
+            search: input => {
+                {% comment %} console.log(input) {% endcomment %}
+                const url = `/search/?title=${input}`
+                return new Promise(resolve => {
+                  fetch(url)
+                  .then(response => response.json())
+                  .then(data => {
+                    {% comment %} console.log(data) {% endcomment %}
+                    resolve(data.data)
+                  })
+                })
+            },
+            onSubmit : result => {
+              console.log("ahah")
+                const url = `/search/?title=${result}`
+                  fetch(url)
+                  .then(response => response.json())
+                  .then(data => {
+                    {% comment %} console.log(data) {% endcomment %}
+                    {% comment %} resolve(data.data) {% endcomment %}
+                    window.location.href=`/item/?id=${data.id}`
+                  })
+                
+              console.log(result)
+              {% comment %} window.open(`/item/?`) {% endcomment %}
+            }
+        })
+        </script>
+        <link
+        rel="stylesheet"
+        href="https://unpkg.com/@trevoreyre/autocomplete-js/dist/style.css"
+        />
             </form>
         {% else %}
             <div class="d-flex mx-0 mx-md-3 w-100">
