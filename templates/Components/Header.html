@@ -33,13 +33,16 @@
                         <option value="Mobile">Mobile</option>
                         </select>
                         <input class="form-control dropdown dropdown-toggle rounded-0 border-0 w-100" style="cursor: text !important;" autocomplete="off"
-                               type="search" placeholder="Search" aria-label="Search" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" oninput="get_search_results(this)"
-                        {% if active == "Home"%}value='{{ q }}'{% endif %}>
-                        <ul class="dropdown-menu bg-gradient bg-light dropdown-menu-md-end w-100 dropdown-menu-" aria-labelledby="searchbar" id="search_filler" style="cursor: pointer; overflow: hidden; text-overflow: ellipsis">
+                               type="search" placeholder="Search" aria-label="Search" role="button" data-bs-toggle="dropdown" aria-expanded="false" oninput="get_search_results(this)"
+                        {% if active == "Home"%}value='{{ q }}'{% endif %} onmouseup="this.toggle()" name="q">
+                        <ul class="dropdown-menu bg-gradient bg-light dropdown-menu-md-end w-100" aria-labelledby="searchbar" id="search_filler" style="cursor: pointer; overflow: hidden; text-overflow: ellipsis">
                             <li class="dropdown-item"><img class="me-2" src="{% static 'res/search_icon.svg' %}"></li>
                         </ul>
                         <button class="rounded-0 rounded-end btn btn-success" type="submit">Search</button>
                         <script>
+                            function search() {
+
+                            }
                             function get_search_results(state) {
                                 const url = `/search/?q=${state.value}`
                                 new Promise(resolve => {
