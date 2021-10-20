@@ -20,11 +20,14 @@ from Main.auth_handler import *
 """
 
 
+# TODO: Track number of requests for a session, timeout if > N reqs/sec
+
 def home(request):
     request.session.pop('login_to_continue_to', None)
     if request.method == "GET":
-        args = {"items": fetchItems(request), "q": ("" if "q" not in request.GET else request.GET["q"][:-1]
-        if request.GET["q"][-1] == '/' else request.GET["q"])}
+        args = {"items": fetchItems(request, search_in=["title", "short_description", "description"]),
+                "q": ("" if "q" not in request.GET else request.GET["q"][:-1]
+                if request.GET["q"][-1] == '/' else request.GET["q"])}
         return render(request, 'pages/home.html', args)
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
@@ -34,7 +37,7 @@ def home(request):
 def search(request):
     MAX_RES = 10
     if request.method == "GET":
-        payload = fetchItems(request)
+        payload = fetchItems(request, search_in=["title", "short_description"])
         return JsonResponse({'status': 200, 'data': payload[0:min(MAX_RES, len(payload))]})
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request, only GET allowed!</p>")
@@ -136,7 +139,7 @@ def signup(request):
 
 def item(request):
     request.session.pop('login_to_continue_to', None)
-    args = {"item": fetchFullItem(request.GET["id"][:-1] if request.GET["id"][-1] == '/' else request.GET["id"])}
+    args = {"item": fetchFullItem(request.GET["id"][:-1] if len(request.GET) > 0 and request.GET["id"][-1] == '/' else request.GET["id"])}
 
     args["in_cart"] = is_in_cart(request.user, args["item"]["ID"]) if request.user.is_authenticated and args[
         "item"] is not None else False
@@ -179,7 +182,8 @@ def profile(request):
     request.session.pop('login_to_continue_to', None)
     if request.user.is_authenticated:
         return HttpResponse(
-            f"<h1>Profile</h1><h2>User ID:</h2><p>{request.user.id}</p><h2>Username:</h2><p>{request.user.username}</p>")
+            f"<h1>Profile</h1><h2>User ID:</h2><p>{request.user.id}</p><h2>Username:</h2><p>{request.user.username}</p>"
+        )
     else:
         request.session['login_to_continue_to'] = '/profile'
         return redirect('/login/')

@@ -40,9 +40,6 @@
                         </ul>
                         <button class="rounded-0 rounded-end btn btn-success" type="submit">Search</button>
                         <script>
-                            function search() {
-
-                            }
                             function get_search_results(state) {
                                 const url = `/search/?q=${state.value}`
                                 new Promise(resolve => {
@@ -53,7 +50,6 @@
                                         `<li><a class="dropdown-item" href="/?q=${state.value}"><img class="me-2" style="height: 24px; width: 24px; object-fit: contain" src="{% static 'res/search_icon.svg' %}">${state.value}</div></a></li>`+
                                             "\n"+
                                         (data.data.map(element => `<li><a class="dropdown-item" href="/item/?id=${element.ID}"><img class="me-1" style="height: 24px; width: 24px; object-fit: contain" src="${element.image}"> ${element.title}</div></a></li>`).join('\n'));
-                                    console.log(data)
                                     resolve(data.data)
                                   })
                                 })

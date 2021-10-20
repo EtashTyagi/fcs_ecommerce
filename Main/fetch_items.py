@@ -13,11 +13,11 @@ from Main.models import Product
 """
 
 
-def fetchItems(request):
+def fetchItems(request, search_in=["title"]):
     # TODO params like sort by, name, etc...
     result_fetch = []
     q_string = ('%' + ("" if "q" not in request.GET else request.GET["q"][:-1]
-    if request.GET["q"][-1] == '/' else request.GET["q"]) + '%').lower()
+    if len(request.GET["q"]) > 0 and request.GET["q"][-1] == '/' else request.GET["q"]) + '%').lower()
     sh_item = lambda product: {'ID': str(prod.ID),
                                'image': prod.image,
                                'title': prod.title,
@@ -25,23 +25,23 @@ def fetchItems(request):
                                'price': str(prod.price),
                                'rating': str(int(random.random() * 11))}
     done_ids = set({})
-    for prod in Product.objects.raw(
-            'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(title) LIKE %s', [q_string]):
-        result_fetch.append(sh_item(prod))
-        done_ids.add(prod.ID)
-
-    for prod in Product.objects.raw(
-            'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(short_description) LIKE %s', [q_string]):
-        if prod.ID not in done_ids:
+    if "title" in search_in:
+        for prod in Product.objects.raw(
+                'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(title) LIKE %s', [q_string]):
             result_fetch.append(sh_item(prod))
             done_ids.add(prod.ID)
-
-    for prod in Product.objects.raw(
-            'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(description) LIKE %s', [q_string]):
-        if prod.ID not in done_ids:
-            result_fetch.append(sh_item(prod))
-            done_ids.add(prod.ID)
-
+    if "short_description" in search_in:
+        for prod in Product.objects.raw(
+                'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(short_description) LIKE %s', [q_string]):
+            if prod.ID not in done_ids:
+                result_fetch.append(sh_item(prod))
+                done_ids.add(prod.ID)
+    if "description" in search_in:
+        for prod in Product.objects.raw(
+                'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(description) LIKE %s', [q_string]):
+            if prod.ID not in done_ids:
+                result_fetch.append(sh_item(prod))
+                done_ids.add(prod.ID)
     return result_fetch
 
 
