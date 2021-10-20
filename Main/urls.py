@@ -10,4 +10,4 @@ Function views
 from django.urls import path
 from . import views
 
-urlpatterns = [path(views.all_views[key]["url"], views.all_views[key]["view"]) for key in views.all_views.keys()]
+urlpatterns = [path(views.all_views[key]["url"][1:], views.all_views[key]["view"]) for key in views.all_views.keys()]

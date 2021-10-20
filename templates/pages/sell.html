@@ -25,26 +25,30 @@
 <body >
 <div class="d-flex align-items-center justify-content-center"
      style="background: antiquewhite; min-height:calc(100vh - 156px)">
-            <form class="mt-4 d-flex flex-column align-items-center w-100 justify-content-center" method="get">
+            <form class="{% if not success %}mt-4{% endif %} d-flex flex-column align-items-center w-100 justify-content-center" method="post">
+                {% csrf_token %}
+                <span class="text-black fw-bold h2 text-center mb-3">{% if success %}Request Sent{% endif %}</span>
                 <label class="d-flex flex-row w-100 justify-content-center" style="height: 125px">
-                    <button class="btn  btn-light me-4" style="width: 50%; max-width: 125px">Upload Image 1</button>
-                    <button class="btn btn-light ms-4" style="width: 50%; max-width: 125px">Upload Image 2</button>
+                    <button class="btn  btn-light me-4 disabled" style="width: 50%; max-width: 125px">Upload Image 1</button>
+                    <button class="btn btn-light ms-4 disabled" style="width: 50%; max-width: 125px">Upload Image 2</button>
                 </label>
-
-            <label class="d-flex flex-row w-100 justify-content-center mt-3">
-                <input class="me-1" id="name" name="name" type="text" placeholder="Product Name" style="width: 50%; max-width: 200px" required>
-                <input class="ms-1" id="type" name="type" type="text" placeholder="Product Type" style="width: 50%; max-width: 200px" required>
+                <label for="image" class="d-flex w-100 mt-3" style="max-width: 410px">
+                    <input class="w-100" id="image" name="image" type="text" placeholder="Image URL" required>
+                </label>
+            <label class="d-flex w-100 mt-3" style="max-width: 410px">
+                <input id="title" class="w-100" name="title" type="text" placeholder="Product Name" required>
             </label>
             <label class="w-100 d-flex mt-3" style="max-width: 410px">
                 <textarea id="short_description" name="short_description" placeholder="Short Description" class="w-100"
                  maxlength="200" required></textarea>
             </label>
                 <label class="w-100 d-flex mt-3" style="max-width: 410px">
-                <textarea id="description" name="description" placeholder="Long Description" class="w-100"
+                <textarea id="description" name="description" placeholder="Long Description (HTML allowed)" class="w-100"
                 maxlength="5000" required></textarea>
             </label>
             <label class="w-100 d-flex mt-3" style="max-width: 410px">
                 <input  id="price" name="price"
+                        step="0.01"
                         min=0.01
                         max=100000000
                         class="w-100" style="max-width: 410px"
