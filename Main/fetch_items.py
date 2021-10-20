@@ -13,7 +13,7 @@ from Main.models import Product
 """
 
 
-def fetchItems(request, search_in=["title"]):
+def fetchItems(request, search_in=["title"], limit=float('inf')):
     # TODO params like sort by, name, etc...
     result_fetch = []
     q_string = ('%' + ("" if "q" not in request.GET else request.GET["q"][:-1]
@@ -25,20 +25,21 @@ def fetchItems(request, search_in=["title"]):
                                'price': str(prod.price),
                                'rating': str(int(random.random() * 11))}
     done_ids = set({})
+    get_limits = lambda: 2147483647 if limit == float('inf') or limit is not int or limit < 0 else limit
     if "title" in search_in:
         for prod in Product.objects.raw(
-                'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(title) LIKE %s', [q_string]):
+                'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(title) LIKE %s limit %s', [q_string, get_limits() - len(result_fetch)]):
             result_fetch.append(sh_item(prod))
             done_ids.add(prod.ID)
     if "short_description" in search_in:
         for prod in Product.objects.raw(
-                'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(short_description) LIKE %s', [q_string]):
+                'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(short_description) LIKE %s limit %s', [q_string, get_limits() - len(result_fetch)]):
             if prod.ID not in done_ids:
                 result_fetch.append(sh_item(prod))
                 done_ids.add(prod.ID)
     if "description" in search_in:
         for prod in Product.objects.raw(
-                'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(description) LIKE %s', [q_string]):
+                'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(description) LIKE %s limit %s', [q_string, get_limits() - len(result_fetch)]):
             if prod.ID not in done_ids:
                 result_fetch.append(sh_item(prod))
                 done_ids.add(prod.ID)

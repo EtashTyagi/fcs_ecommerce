@@ -26,7 +26,7 @@ def home(request):
     request.session.pop('login_to_continue_to', None)
     if request.method == "GET":
         args = {"items": fetchItems(request, search_in=["title", "short_description", "description"]),
-                "q": ("" if "q" not in request.GET else request.GET["q"][:-1]
+                "q": ("" if "q" not in request.GET or len(request.GET["q"]) == 0 else request.GET["q"][:-1]
                 if request.GET["q"][-1] == '/' else request.GET["q"])}
         return render(request, 'pages/home.html', args)
     else:
@@ -37,7 +37,7 @@ def home(request):
 def search(request):
     MAX_RES = 10
     if request.method == "GET":
-        payload = fetchItems(request, search_in=["title", "short_description"])
+        payload = fetchItems(request, search_in=["title"], limit=MAX_RES)
         return JsonResponse({'status': 200, 'data': payload[0:min(MAX_RES, len(payload))]})
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request, only GET allowed!</p>")
