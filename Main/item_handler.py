@@ -10,13 +10,15 @@ from django.db import connection
 from Main.models import Product, NewProductRequest
 
 # Return None for invalid request
+from Main.upload_handler import is_valid_file, upload_request_file
+
 """
     Params in request (method == GET)
         1. q -> search query
 """
 
 
-def fetchItems(request, search_in=["title"], limit=float('inf')):
+def fetchItems(request, search_in=("title",), limit=float('inf')):
     # TODO params like sort by, name, etc...
     result_fetch = []
     q_string = ('%' + ("" if "q" not in request.GET else request.GET["q"][:-1]
@@ -68,23 +70,26 @@ def fetchFullItem(itemID):
 
 
 def insert_new_item_request(request):
-    seller_uid = request.user.id
-    image = request.POST["image"]
-    title = request.POST["title"]
-    short_description = request.POST["short_description"]
-    description = request.POST["description"]
-    price = request.POST["price"]
-
-    with connection.cursor() as cursor:
-        cursor.execute("""INSERT INTO new_product_requests
-        (seller_uid, image, title, short_description, description, price)
-         VALUES (%s, %s, %s, %s, %s, %s)""", [seller_uid, image, title, short_description, description, price])
+    if "pdf" in request.FILES and is_valid_file(request.FILES["pdf"]):
+        seller_uid = request.user.id
+        upload_request_file(request.FILES["pdf"], seller_uid)
+        image = request.POST["image"]
+        title = request.POST["title"]
+        short_description = request.POST["short_description"]
+        description = request.POST["description"]
+        price = request.POST["price"]
+        pdf_name = request.FILES["pdf"].name
+        with connection.cursor() as cursor:
+            cursor.execute("""INSERT INTO new_product_requests
+            (seller_uid, image, title, short_description, description, price, pdf_name)
+             VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                           [seller_uid, image, title, short_description, description, price, pdf_name])
 
 
 def fetch_new_item_requests():
     result_fetch = []
     for prod in NewProductRequest.objects.raw(
-            'SELECT 1 id, req_id, title, image, short_description, description, price, seller_uid FROM new_product_requests'):
+            'SELECT 1 id, req_id, title, image, short_description, description, price, seller_uid, pdf_name FROM new_product_requests'):
         result_fetch.append({
             'req_id': str(prod.req_id),
             'seller_uid': str(prod.seller_uid),
@@ -92,7 +97,8 @@ def fetch_new_item_requests():
             'title': prod.title,
             'price': str(prod.price),
             'short_description': prod.short_description,
-            'description': prod.description
+            'description': prod.description,
+            'pdf_name': prod.pdf_name
         })
     return result_fetch
 

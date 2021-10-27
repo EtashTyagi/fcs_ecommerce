@@ -1,0 +1,51 @@
+<div class="card my-2" style="width: 90%; max-width: 1000px">
+    <div class="w-100 mx-0 p-0">
+    <div class="card-header w-100 mb-1">
+  		<div class="col-md-10"><h1>{{ user.username }}</h1></div>
+    </div>
+    <div class="row p-2">
+  		<div class="col-md-3"><!--left col-->
+
+
+      <div class="text-center">
+        <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar">
+      </div><br>
+
+        </div><!--/col-3-->
+    	<div class="col-md-9">
+          <div class="tab-content">
+            <div class="tab-pane active" id="home">
+                <hr class="mt-0">
+                <div>
+                    <div class="col-xs-6">
+                        <h4>User ID</h4>
+                        <span>{{ user.id }}</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="col-xs-6">
+                        <h4>Email-ID</h4>
+                        <span>{{ user.email }}</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="col-xs-6">
+                        <h4>Role</h4>
+                        <span>{{ user.email }}</span>
+                    </div>
+                </div>
+                <hr>
+                <div>
+                    <div class="col-xs-6">
+                        <button class="btn btn-primary">Change Info</button>
+                    </div>
+                </div>
+              <hr>
+          </div><!--/tab-content-->
+
+        </div><!--/col-9-->
+    </div><!--/row-->
+</div>
+    </div>
+</div>
+

@@ -25,6 +25,9 @@
 <body >
 <div class="d-flex align-items-center justify-content-center flex-column py-1"
      style="background: antiquewhite; min-height:calc(100vh - 156px)">
+     {% block basic_profile %}
+         {% include 'Components/basic_profile.html' %}
+    {% endblock basic_profile %}
     {% for request in requests %}
         <form class="my-1 card" style="width: 90%; max-width: 1000px" method="post">
         {% csrf_token %}
