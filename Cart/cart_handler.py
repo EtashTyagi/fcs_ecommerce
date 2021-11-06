@@ -1,16 +1,16 @@
 # TODO: CHECK IF ITEMS ARE IN STOCK, SHOW NUMBER OF ITEMS IN STOCK
 from django.db import connection
 
-from Main.models import Product
+from Store.models import Product
 
 
 def fetchCart(user):
     fetched_list = []
     for prod in Product.objects.raw(
-            'SELECT 1 id, ID, title, image, price, quantity FROM (SELECT * FROM cart WHERE user_id = %s) as my_cart INNER JOIN products ON my_cart.product_id = products.ID;',
+            'SELECT id, title, image, price, quantity FROM (SELECT * FROM cart WHERE user_id = %s) as my_cart INNER JOIN store_product ON my_cart.product_id = store_product.id;',
             [user.id]):
         fetched_list.append({
-            'ID': str(prod.ID),
+            'ID': str(prod.id),
             'image': str(prod.image),
             'title': prod.title,
             'qty': 1,

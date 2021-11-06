@@ -20,7 +20,11 @@ from Utils.item_handler import *
 def search(request):
     MAX_RES = 10
     if request.method == "GET":
-        payload = fetchItems(request, search_in=["title"], limit=MAX_RES)
+        payload = []
+        if "sc" in request.GET:
+            payload = fetchCategories()
+        else:
+            payload = fetchItems(request, search_in=["title"], limit=MAX_RES)
         return JsonResponse({'status': 200, 'data': payload[0:min(MAX_RES, len(payload))]})
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request, only GET allowed!</p>")

@@ -60,6 +60,7 @@ def signup(request):
         response = create_user(request)
         if not response[0]:
             args["failed"] = True
+            args["message"] = response[1]
             return render(request, 'pages/signup.html', args)
         else:
             args["user"] = response[1]

@@ -5,7 +5,8 @@ import random
 
 from django.db import connection
 
-from Main.models import Product, NewProductRequest
+from Store.models import Product
+from Sell.models import NewProductRequest
 
 # Return None for invalid request
 from Utils.upload_handler import is_valid_file, upload_request_file
@@ -13,7 +14,15 @@ from Utils.upload_handler import is_valid_file, upload_request_file
 """
     Params in request (method == GET)
         1. q -> search query
+        2. c -> category
 """
+
+
+def fetchCategories():
+    categories = []
+    for prod in Product.objects.raw('SELECT DISTINCT(category), 1 id FROM store_product'):
+        categories.append(prod.category.title())
+    return categories
 
 
 def fetchItems(request, search_in=("title",), limit=float('inf')):
@@ -21,7 +30,9 @@ def fetchItems(request, search_in=("title",), limit=float('inf')):
     result_fetch = []
     q_string = ('%' + ("" if "q" not in request.GET else request.GET["q"][:-1]
     if len(request.GET["q"]) > 0 and request.GET["q"][-1] == '/' else request.GET["q"]) + '%').lower()
-    sh_item = lambda product: {'ID': str(prod.ID),
+    category = ('%' + ("" if "c" not in request.GET else request.GET["c"][:-1]
+    if len(request.GET["c"]) > 0 and request.GET["c"][-1] == '/' else request.GET["c"]) + '%').lower()
+    sh_item = lambda product: {'ID': str(prod.id),
                                'image': prod.image,
                                'title': prod.title,
                                'short_description': prod.short_description,
@@ -31,31 +42,32 @@ def fetchItems(request, search_in=("title",), limit=float('inf')):
     get_limits = lambda: 2147483647 if limit == float('inf') or limit is not int or limit < 0 else limit
     if "title" in search_in:
         for prod in Product.objects.raw(
-                'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(title) LIKE %s limit %s',
-                [q_string, get_limits() - len(result_fetch)]):
+                'SELECT id, title, image, short_description, price, category FROM store_product WHERE LOWER(title) LIKE %s AND LOWER(category) LIKE %s limit %s',
+                [q_string, category, get_limits() - len(result_fetch)]):
             result_fetch.append(sh_item(prod))
-            done_ids.add(prod.ID)
+            done_ids.add(prod.id)
     if "short_description" in search_in:
         for prod in Product.objects.raw(
-                'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(short_description) LIKE %s limit %s',
-                [q_string, get_limits() - len(result_fetch)]):
-            if prod.ID not in done_ids:
+                'SELECT id, title, image, short_description, price FROM store_product WHERE LOWER(short_description) LIKE %s AND LOWER(category) LIKE %s limit %s',
+                [q_string, category, get_limits() - len(result_fetch)]):
+            if prod.id not in done_ids:
                 result_fetch.append(sh_item(prod))
-                done_ids.add(prod.ID)
+                done_ids.add(prod.id)
     if "description" in search_in:
         for prod in Product.objects.raw(
-                'SELECT 1 id, ID, title, image, short_description, price FROM products WHERE LOWER(description) LIKE %s limit %s',
-                [q_string, get_limits() - len(result_fetch)]):
-            if prod.ID not in done_ids:
+                'SELECT id, title, image, short_description, price FROM store_product WHERE LOWER(description) LIKE %s AND LOWER(category) LIKE %s  limit %s',
+                [q_string, category, get_limits() - len(result_fetch)]):
+            if prod.id not in done_ids:
                 result_fetch.append(sh_item(prod))
-                done_ids.add(prod.ID)
+                done_ids.add(prod.id)
     return result_fetch
 
 
 # Return None for invalid request
 def fetchFullItem(itemID):
-    for prod in Product.objects.raw('SELECT 1 id, title, image, description, price FROM products WHERE products.ID=%s',
-                                    [itemID]):
+    for prod in Product.objects.raw(
+            'SELECT id, title, image, description, price FROM store_product WHERE store_product.id=%s',
+            [itemID]):
         return {
             'ID': str(itemID),
             'image': prod.image,
@@ -77,20 +89,22 @@ def insert_new_item_request(request):
         description = request.POST["description"]
         price = request.POST["price"]
         pdf_name = request.FILES["pdf"].name
+        prod_type = request.POST["prod_type"].lower()
         with connection.cursor() as cursor:
-            cursor.execute("""INSERT INTO new_product_requests
-            (seller_uid, image, title, short_description, description, price, pdf_name)
-             VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                           [seller_uid, image, title, short_description, description, price, pdf_name])
+            cursor.execute("""INSERT INTO sell_newproductrequest
+            (seller_uid, image, title, short_description, description, price, pdf_name, category)
+             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                           [seller_uid, image, title, short_description, description, price, pdf_name, prod_type])
 
 
 def fetch_new_item_requests():
     result_fetch = []
     for prod in NewProductRequest.objects.raw(
-            'SELECT 1 id, req_id, title, image, short_description, description, price, seller_uid, pdf_name FROM new_product_requests'):
+            'SELECT  id, title, image, short_description, description, price, seller_uid, pdf_name, category FROM sell_newproductrequest'):
         result_fetch.append({
-            'req_id': str(prod.req_id),
+            'req_id': str(prod.id),
             'seller_uid': str(prod.seller_uid),
+            'category': str(prod.category),
             'image': prod.image,
             'title': prod.title,
             'price': str(prod.price),
@@ -101,26 +115,27 @@ def fetch_new_item_requests():
     return result_fetch
 
 
-def accept_item(req_id):
+def accept_item(id):
     for prod in NewProductRequest.objects.raw(
-            'SELECT 1 id, title, image, short_description, description, price FROM new_product_requests WHERE req_id=%s LIMIT 1',
-            [req_id]):
+            'SELECT id, title, image, short_description, description, price, category FROM sell_newproductrequest WHERE id=%s LIMIT 1',
+            [id]):
         with connection.cursor() as cursor:
-            cursor.execute("""INSERT INTO products
-            (image, title, short_description, description, price)
-             VALUES (%s, %s, %s, %s, %s)""",
-                           [prod.image, prod.title, prod.short_description, prod.description, prod.price])
+            cursor.execute("""INSERT INTO store_product
+            (image, title, short_description, description, price, category)
+             VALUES (%s, %s, %s, %s, %s, %s)""",
+                           [prod.image, prod.title, prod.short_description, prod.description, prod.price, prod.category])
     with connection.cursor() as cursor:
-        cursor.execute("""DELETE FROM new_product_requests WHERE req_id=%s""", [req_id])
+        cursor.execute("""DELETE FROM sell_newproductrequest WHERE id=%s""", [id])
 
 
-def reject_item(req_id):
+def reject_item(id):
     with connection.cursor() as cursor:
-        cursor.execute("""DELETE FROM new_product_requests WHERE req_id=%s""", [req_id])
+        cursor.execute("""DELETE FROM sell_newproductrequest WHERE id=%s""", [id])
+    return True
 
 
-def request_exists(req_id):
+def request_exists(id):
     for prod in NewProductRequest.objects.raw(
-            'SELECT 1 id, req_id FROM new_product_requests WHERE req_id=%s', [req_id]):
+            'SELECT 1 id, id FROM sell_newproductrequest WHERE id=%s', [id]):
         return True
     return False

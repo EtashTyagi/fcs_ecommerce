@@ -15,15 +15,19 @@ from Utils.item_handler import *
         6. When combined (POST and must be authed), handle auth inside the request type block !!
         7. After change to database using POST 'ALWAYS' redirect !!!
 """
-# TODO: Track number of requests for a session, timeout if > N reqs/sec
 
+
+# TODO: Track number of requests for a session, timeout if > N reqs/sec
 
 def store(request):
     request.session.pop('login_to_continue_to', None)
     if request.method == "GET":
         args = {"items": fetchItems(request, search_in=["title", "short_description", "description"]),
                 "q": ("" if "q" not in request.GET or len(request.GET["q"]) == 0 else request.GET["q"][:-1]
-                if request.GET["q"][-1] == '/' else request.GET["q"])}
+                if request.GET["q"][-1] == '/' else request.GET["q"]),
+                "c": ("" if "c" not in request.GET or len(request.GET["c"]) == 0 else request.GET["c"][:-1]
+                if request.GET["c"][-1] == '/' else request.GET["c"])
+                }
         return render(request, 'pages/store.html', args)
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request</p>")

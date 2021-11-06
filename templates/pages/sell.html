@@ -35,8 +35,13 @@
                 <label for="image" class="d-flex w-100 mt-3" style="max-width: 410px">
                     <input class="w-100" id="image" name="image" type="text" placeholder="Image URL" required>
                 </label>
-            <label class="d-flex w-100 mt-3" style="max-width: 410px">
-                <input id="title" class="w-100" name="title" type="text" placeholder="Product Name" required>
+            <label class="d-flex w-100 mt-3 flex-row" style="max-width: 410px">
+                <label class="w-50 me-1">
+                    <input id="title" class="w-100" name="title" type="text" placeholder="Product Name" required>
+                </label>
+                <label class="w-50 ms-1">
+                    <input id="title" class="w-100" name="prod_type" type="text" placeholder="Product Type" required>
+                </label>
             </label>
             <label class="w-100 d-flex mt-3" style="max-width: 410px">
                 <textarea id="short_description" name="short_description" placeholder="Short Description" class="w-100"

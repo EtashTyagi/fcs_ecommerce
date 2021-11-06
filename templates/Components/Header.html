@@ -23,37 +23,52 @@
         </li>
       </ul>
         {% if active == "Home" or active == "Store" or active == "Sell" or active == "Item"%}
-            <form class="d-flex mx-0 mx-md-3 w-100 form-inline">
+            <form class="d-flex mx-0 mx-md-3 w-100 form-inline" id="searchbar_form" method="get" action="/store">
                 <div class="rounded-0 border-0 w-100 d-flex flex-row" id="autocomplete">
 
                     <div class="rounded-0 border-0 w-100 d-flex flex-row dropdown" style="cursor: text !important;" id="searchbar">
-                        <select class="form-select p-0 rounded-0 rounded-start select2 select2-search--dropdown btn-success pe-4 ps-2" style="max-width: 90px">
-                        <option value="All">All</option>
-                        <option value="Laptop">Laptop</option>
-                        <option value="Mobile">Mobile</option>
+                        <select class="form-select p-0 rounded-0 rounded-start select2 select2-search--dropdown btn-success pe-4 ps-2" style="max-width: 90px" id="catdd"
+                        onchange="get_search_results(document.getElementById('srch'))" name="c">
+                            <option value="">All</option>
                         </select>
-                        <input class="form-control dropdown dropdown-toggle rounded-0 border-0 w-100" style="cursor: text !important;" autocomplete="off"
+                        <input class="form-control dropdown dropdown-toggle rounded-0 border-0 w-100" style="cursor: text !important;" autocomplete="off" id="srch"
                                type="search" placeholder="Search" aria-label="Search" role="button" data-bs-toggle="dropdown" aria-expanded="false" oninput="get_search_results(this)"
                         {% if active == "Home"%}value='{{ q }}'{% endif %} onmouseup="this.toggle()" name="q">
                         <ul class="dropdown-menu bg-gradient bg-light dropdown-menu-md-end w-100" aria-labelledby="searchbar" id="search_filler" style="cursor: pointer; overflow: hidden; text-overflow: ellipsis">
                             <li class="dropdown-item"><img class="me-2" src="{% static 'res/search_icon.svg' %}"></li>
                         </ul>
-                        <button class="rounded-0 rounded-end btn btn-success" type="submit">Search</button>
+                        <button class="rounded-0 rounded-end btn btn-success" type="submit" id="subsrch">Search</button>
                         <script>
                             function get_search_results(state) {
-                                const url = `/search/?q=${state.value}`
+                                let e = document.getElementById("catdd");
+                                let strUser = e.value;
+                                const url = `/search/?q=${state.value}&c=${strUser}`
                                 new Promise(resolve => {
                                   fetch(url)
                                   .then(response => response.json())
                                   .then(data => {
                                     document.getElementById("search_filler").innerHTML =
-                                        `<li><a class="dropdown-item" href="/?q=${state.value}"><img class="me-2" style="height: 24px; width: 24px; object-fit: contain" src="{% static 'res/search_icon.svg' %}">${state.value}</div></a></li>`+
+                                        `<li><a class="dropdown-item" href="/store/?q=${state.value}&c=${strUser}"><img class="me-2" style="height: 24px; width: 24px; object-fit: contain" src="{% static 'res/search_icon.svg' %}">${state.value}</div></a></li>`+
                                             "\n"+
                                         (data.data.map(element => `<li><a class="dropdown-item" href="/item/?id=${element.ID}"><img class="me-1" style="height: 24px; width: 24px; object-fit: contain" src="${element.image}"> ${element.title}</div></a></li>`).join('\n'));
                                     resolve(data.data)
                                   })
                                 })
                             }
+                            document.getElementById("catdd").innerHTML = `<option value="">All</option>`;
+                            const url = `/search/?sc`
+                                new Promise(resolve => {
+                                  fetch(url)
+                                  .then(response => response.json())
+                                  .then(data => {
+                                      console.log(data)
+                                    document.getElementById("catdd").innerHTML =
+                                        `<option value="">All</option>`+
+                                            "\n"+
+                                        (data.data.map(element => {return `<option value="${element}">${element}</option>`}).join('\n'));
+                                    resolve(data.data)
+                                  })
+                                })
                         </script>
                     </div>
                 </div>
