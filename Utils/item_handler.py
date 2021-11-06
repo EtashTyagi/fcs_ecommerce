@@ -1,8 +1,6 @@
 # TODO: Number of available items, use in cart and while displaying on main tab
 # IMPORTANT: PLEASE DO NOT USE FORMAT STRING IN RAW SQL QUERIES, IT WILL CAUSE SQL INJECTIONS:
 # https://docs.djangoproject.com/en/3.2/topics/db/sql/
-import json
-import math
 import random
 
 from django.db import connection
@@ -10,7 +8,7 @@ from django.db import connection
 from Main.models import Product, NewProductRequest
 
 # Return None for invalid request
-from Main.upload_handler import is_valid_file, upload_request_file
+from Utils.upload_handler import is_valid_file, upload_request_file
 
 """
     Params in request (method == GET)

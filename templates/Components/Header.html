@@ -16,13 +16,13 @@
           <a class="nav-link {% if active == 'Home' %}active{% endif %}" aria-current="page" href="/">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if active == 'Discounts' %}active{% endif %}" href="/discounts">Discounts</a>
+          <a class="nav-link {% if active == 'Store' %}active{% endif %}" href="/store">Store</a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if active == 'Sell' %}active{% endif %}" href="/sell">Sell</a>
         </li>
       </ul>
-        {% if active == "Home" or active == "Discounts" or active == "Sell" or active == "Item"%}
+        {% if active == "Home" or active == "Store" or active == "Sell" or active == "Item"%}
             <form class="d-flex mx-0 mx-md-3 w-100 form-inline">
                 <div class="rounded-0 border-0 w-100 d-flex flex-row" id="autocomplete">
 
@@ -65,7 +65,7 @@
       <div class="d-flex flex-row me-auto mb-2 mb-md-0">
         <div class="nav-item dropdown pt-2 pt-md-0">
             <a class="dropdown-toggle btn {% if active == 'Login' %}btn-outline-success{% endif %} link-primary ps-md-2" href="#" id="login" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <img class="rounded-circle" height="28px" src="https://clinicforspecialchildren.org/wp-content/uploads/2016/08/avatar-placeholder.gif" alt="User"/>
+              <img class="rounded-circle" height="28px" src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" alt="User"/>
             </a>
         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-md-end" aria-labelledby="login">
             {% if not user.is_authenticated %}

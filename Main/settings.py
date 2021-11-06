@@ -35,7 +35,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Main'
+    'Main',
+    'Authentication',
+    'Cart',
+    'PaymentGateway',
+    'Profile',
+    'Search',
+    'Sell',
+    'Store',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +75,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Main.wsgi.application'
+AUTH_USER_MODEL = 'Authentication.Account'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
