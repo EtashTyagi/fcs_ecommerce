@@ -24,20 +24,60 @@ from Authentication.auth_handler import *
 
 def profile(request):
     request.session.pop('login_to_continue_to', None)
-    if request.user.is_authenticated:
-        if request.user.is_superuser:
-            # TODO: Change
-            return redirect(all_urls["admin_response_to_new_item_request"])
+    if request.method == "GET":
+        usr_id = request.user.id
+        if "id" in request.GET:
+            usr_id = request.GET["id"][-1] if len(request.GET["id"]) > 0 and request.GET["id"][-1] == '/' else request.GET["id"]
+
+        if request.user.is_authenticated:
+            user = User.objects.get(id=usr_id)
+            if user:
+                args = {"group": None, "id": user.id, "email": user.email, "owner": user.id == request.user.id,
+                        "username": user.username}
+                if user.is_superuser:
+                    args["group"] = "admin"
+                elif is_seller(user):
+                    args["group"] = "seller"
+                elif is_buyer(user):
+                    args["group"] = "buyer"
+                else:
+                    args["group"] = ""
+                return render(request, 'pages/main_profile.html', args)
+            else:
+                return HttpResponse("<h1>Error</h1><p>User Not Found!</p>")
         else:
-            return HttpResponse(
-                f"<h1>Profile</h1><h2>User ID:</h2><p>{request.user.id}</p><h2>Username:</h2><p>{request.user.username}</p>"
-            )
+            request.session['login_to_continue_to'] = all_urls["profile"]
+            return redirect(all_urls["login"])
     else:
-        request.session['login_to_continue_to'] = all_urls["profile"]
-        return redirect(all_urls["login"])
+        return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
 
 
 def admin_response_to_new_item_request_GUI(request):
+    if request.user.is_authenticated and request.user.is_superuser:
+        if request.method == "GET":
+            req_items = fetch_new_item_requests()
+            args = {"requests": req_items, "keys": list(req_items[0].keys()) if len(req_items) != 0 else []}
+            return render(request, 'pages/admin_response_to_new_item_request.html', args)
+        elif request.method == "POST":
+            print(request.POST)
+            if "response_accept" in request.POST == "response_decline" in request.POST:
+                return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+            elif "response_accept" in request.POST and request_exists(request.POST["response_accept"]):
+                accept_item(request.POST["response_accept"])
+            elif "response_decline" in request.POST and request_exists(request.POST["response_decline"]):
+                reject_item(request.POST["response_decline"])
+            else:
+                return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+            req_items = fetch_new_item_requests()
+            args = {"requests": req_items, "keys": list(req_items[0].keys()) if len(req_items) != 0 else []}
+            return render(request, 'pages/admin_response_to_new_item_request.html', args)
+        else:
+            return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+    else:
+        return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+
+
+def admin_response_to_update_item_request_GUI(request):
     if request.user.is_authenticated and request.user.is_superuser:
         if request.method == "GET":
             req_items = fetch_new_item_requests()

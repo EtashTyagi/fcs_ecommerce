@@ -19,7 +19,7 @@ from Utils.all_urls import all_urls
 
 def cart(request):
     request.session.pop('login_to_continue_to', None)
-    args = {"items": fetchCart(request.user)}
+    args = {"item": fetchCart(request.user)}
     if not request.user.is_authenticated:
         request.session['login_to_continue_to'] = all_urls["cart"]
         return redirect(all_urls["login"])

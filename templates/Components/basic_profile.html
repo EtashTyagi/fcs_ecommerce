@@ -1,7 +1,7 @@
 <div class="card my-2" style="width: 90%; max-width: 1000px">
     <div class="w-100 mx-0 p-0">
     <div class="card-header w-100 mb-1">
-  		<div class="col-md-10"><h1>{{ user.username }}</h1></div>
+  		<div class="col-md-10"><h1>{{ username }}</h1></div>
     </div>
     <div class="row p-2">
   		<div class="col-md-3"><!--left col-->
@@ -19,28 +19,66 @@
                 <div>
                     <div class="col-xs-6">
                         <h4>User ID</h4>
-                        <span>{{ user.id }}</span>
+                        <span>{{ id }}</span>
                     </div>
                 </div>
                 <div>
                     <div class="col-xs-6">
                         <h4>Email-ID</h4>
-                        <span>{{ user.email }}</span>
+                        <span>{{ email }}</span>
                     </div>
                 </div>
                 <div>
                     <div class="col-xs-6">
                         <h4>Role</h4>
-                        <span>{{ user.email }}</span>
+                        <span>{{ group }}</span>
                     </div>
                 </div>
                 <hr>
-                <div>
-                    <div class="col-xs-6">
-                        <button class="btn btn-primary">Change Info</button>
+                {% if owner %}
+                <div class="w-100 d-flex flex-column">
+                    {% if group == "buyer" or group == "seller" or group == "admin" %}
+                    <div class="w-100">
+                        <button class="btn btn-primary w-100">Modify Profile</button>
                     </div>
+                    <div class="mt-1 w-100">
+                        <button class="btn btn-secondary w-100">Purchases</button>
+                    </div>
+                    {% else %}
+                    <div class="mt-1 w-100">
+                        <span class="text-danger w-100">Account not verified</span>
+                    </div>
+                    {% endif %}
+                    {% if group == "buyer" %}
+                        <div class="mt-1 w-100">
+                            <button class="btn btn-success w-100">Become A Seller</button>
+                        </div>
+                    {% endif %}
+                    {% if group == "seller" or group == "admin"%}
+                        <div class="mt-1 w-100">
+                            <button class="btn btn-success w-100">Sell Panel</button>
+                        </div>
+                    {% endif %}
+                    {% if group == "admin" %}
+                        <div class="mt-1 w-100 d-flex flex-row">
+                            <a class="btn btn-danger w-100" href="/admin/">Admin Panel</a>
+                        </div>
+                        <div class="dropdown w-100 mt-1">
+                          <button class="btn btn-dark dropdown-toggle w-100"
+                                  type="button" id="dropdownMenuButton"
+                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Handle Requests
+                          </button>
+                          <div class="dropdown-menu dropdown-menu-dark w-100" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="/item_handler/">New Item</a>
+                            <a class="dropdown-item" href="#">Update Item</a>
+                            <a class="dropdown-item" href="#">New Seller</a>
+                          </div>
+                        </div>
+                    {% endif %}
                 </div>
               <hr>
+            {%endif%}
           </div><!--/tab-content-->
 
         </div><!--/col-9-->

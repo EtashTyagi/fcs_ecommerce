@@ -33,12 +33,9 @@
             <div class="d-flex flex-column justify-content-center align-items-center my-2 card" style="width: 90%; max-width: 1150px">
                 <span class="h1 card-header w-100 card-title text-start" style="font-size: xxx-large; text-align: center">My Cart</span>
                 <div>
-                    <span class="h1 card-subtitle " style="font-size: xx-large">Total Cost: </span> <span class="h1" style="font-size: xx-large" id="client_cost"></span> <span style="font-size: xx-large" id="client_cost">$</span>
-                    <script>
-                        set_client_cost({% for item in items %}+(parseFloat({{ item.price }}) * parseFloat({{ item.qty }})){% endfor %})
-                    </script>
+                    <span class="h1 card-subtitle " style="font-size: xx-large">Total Cost: </span> <span class="h1" style="font-size: xx-large" id="client_cost">{% if item %}{{ item.price }}{% else %}0{% endif %}</span> <span style="font-size: xx-large" id="client_cost">$</span>
                 </div>
-                {% for item in items %}
+                {% if item %}
                     <div class="d-flex flex-row flex-wrap w-100 justify-content-evenly align-stretch mt-3">
                         <div class="m-2" style="width: 600px; flex-grow: 2; max-width: 100%; ">
                             <div class="d-flex card p-0 text-start text-dark flex-row align-items-start justify-content-center p-1 pe-2 w-100 flex-wrap" style="background:rgba(0,0,0, 0.02);overflow: hidden">
@@ -48,40 +45,22 @@
                                     </a>
                                     <div class="card-footer d-flex flex-row align-items-center" style="width:300px; max-height: 36px;overflow: hidden">
                                         <small class="text-muted"><b>Cost:</b></small>
-                                        <small class="ms-1" id="tot_price_{{ item.ID }}" style="overflow: hidden"></small>
+                                        <small class="ms-1" id="tot_price_{{ item.ID }}" style="overflow: hidden">{{ item.price }}</small>
                                         <span style="font-size: 18px; font-weight: lighter">$</span>
-                                        <script>
-                                            document.getElementById("tot_price_{{ item.ID }}").innerHTML = (parseFloat({{ item.qty }}) * parseFloat({{ item.price }})).toFixed(2)
-                                        </script>
                                     </div>
 
                                 </div>
                                 <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center" style="width: 250px">
                                     <div class="card-body p-0 w-100 ps-2 d-flex flex-column" style="overflow: hidden">
                                         <span class="card-title h2" style="font-size: xx-large; min-height: 50px;white-space: initial">{{ item.title }}</span>
-                                            <input id="n_items_{{ item.ID }}"
-                                                min=1
-                                                max=99
-                                                class="w-100"
-                                                type = "number"
-                                                placeholder="Quantity" value="{{ item.qty }}"
-                                                oninput="if (this.value.length === 0) return;
-                                                         if (this.value > 99) this.value = this.max;
-                                                         if (this.value < this.min) this.value = this.min;
-                                                         let prev = parseFloat(document.getElementById('tot_price_{{ item.ID }}').innerHTML)
-                                                         let user_side_price = (value * parseFloat({{ item.price }}))
-                                                         document.getElementById('tot_price_{{ item.ID }}').innerHTML = user_side_price.toFixed(2).toLocaleString();
-                                                         let prev_tot = parseFloat(document.getElementById('client_cost').innerHTML)
-                                                         set_client_cost(prev_tot + user_side_price - prev)"
-                                                         >
-                                            <button class="btn btn-danger my-2 w-100" name="remove_from_cart" value="{{ item.ID }}" type="submit">Remove</button>
+                                        <button class="btn btn-danger my-2 w-100" name="remove_from_cart" value="{{ item.ID }}" type="submit">Remove</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                {% endfor %}
-                <button class="btn btn-success my-2 mb-3" style="width: 90%; max-width: 500px">Checkout</button>
+                    {% endif %}
+                <button class="btn btn-success my-2 mb-3" {% if not item %}disabled{% endif %} style="width: 90%; max-width: 500px">Checkout</button>
             </div>
             </div>
         </form>

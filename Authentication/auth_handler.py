@@ -1,7 +1,7 @@
 # IMPORTANT: PLEASE DO NOT USE FORMAT STRING IN RAW SQL QUERIES, IT WILL CAUSE SQL INJECTIONS
 # https://docs.djangoproject.com/en/3.2/topics/db/sql/
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db import connection
 
 common_passwords = ["password", "12345678"]  # store in sql maybe?
@@ -25,7 +25,26 @@ def create_user(request):
         created.last_name = last_name
         created.save()
         add_phone_number(created.id, phone)
+        make_buyer(created)
         return [True, created]
+
+
+def is_seller(user):
+    return user.groups.filter(name='seller').exists()
+
+
+def is_buyer(user):
+    return user.groups.filter(name='buyer').exists()
+
+
+def make_seller(user):
+    group = Group.objects.get(name="seller")
+    user.groups.add(group)
+
+
+def make_buyer(user):
+    group = Group.objects.get(name="buyer")
+    user.groups.add(group)
 
 
 def authenticate_user(request):

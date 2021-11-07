@@ -87,7 +87,7 @@
                 <li><a class="dropdown-item" href="/login">Login</a></li>
                 <li><a class="dropdown-item" href="/signup">Signup</a></li>
             {% else %}
-                <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                <li><a class="dropdown-item" href="/profile/?id={{ user.id }}">Profile</a></li>
                 <li><a class="dropdown-item" href="/logout">Logout</a></li>
             {% endif %}
         </ul>

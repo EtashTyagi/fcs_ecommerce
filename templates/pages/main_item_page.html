@@ -31,8 +31,40 @@
                align-items-center align-items-md-start"
                  style="width: 90%">
                 <div class="mb-md-2 h-100 mt-2 mt-md-4 px-2 px-md-0 ps-md-2 w-100 d-flex flex-column align-items-center justify-content-center" style="min-width: 300px; max-width: 500px">
-                    <img src='{{ item.image }}'
+                    <img src='{{ item.image_1 }}'
                          class="card-img-top card-img rounded-0 rounded-top" style="max-width: 500px; max-height: 300px;object-fit: contain" id="image" alt="Card image cap">
+                    <div class="w-100 d-flex justify-content-center flex-row my-2" style="max-width: 300px">
+                        <img src='{{ item.image_1 }}' onclick="switch_to_image(this)"
+                         class="card-img-top card-img rounded-2 btn p-0" style="max-width: 60px; max-height: 36px;object-fit: contain" id="image1" alt="Card image sm">
+                        {% if item.image_2%}
+                            <img src='{{ item.image_2 }}' onclick="switch_to_image(this)"
+                         class="card-img-top card-img rounded-2 btn p-0" style="max-width: 60px; max-height: 36px;object-fit: contain" id="image2" alt="Card image sm">
+                        {% endif %}
+                        {% if item.image_3%}
+                            <img src='{{ item.image_3 }}' onclick="switch_to_image(this)"
+                         class="card-img-top card-img rounded-2 btn p-0" style="max-width: 60px; max-height: 36px;object-fit: contain" id="image3" alt="Card image sm">
+                        {% endif %}
+                        {% if item.image_4 %}
+                            <img src='{{ item.image_4 }}' onclick="switch_to_image(this)"
+                         class="card-img-top card-img rounded-2 btn p-0" style="max-width: 60px; max-height: 36px;object-fit: contain" id="image4" alt="Card image sm">
+                        {% endif %}
+                        {% if item.image_5%}
+                            <img src='{{ item.image_5 }}' onclick="switch_to_image(this)"
+                         class="card-img-top card-img rounded-2 btn p-0" style="max-width: 60px; max-height: 36px;object-fit: contain" id="image5" alt="Card image sm">
+                        {% endif %}
+                    </div>
+                    <script>
+                        let act_img = document.getElementById("image1")
+                        let main_place_holder = document.getElementById("image")
+                        main_place_holder.src = act_img.src
+                        act_img.classList.toggle("border-dark")
+                        function switch_to_image(which) {
+                        act_img.classList.toggle("border-dark")
+                            act_img = which
+                        act_img.classList.toggle("border-dark")
+                            main_place_holder.src = act_img.src
+                        }
+                    </script>
                     <div class="w-100 d-flex justify-content-around flex-column">
                         <div class="card-footer d-flex flex-row align-items-center" style="max-height: 36px">
                             <small class="text-muted"><b>Price:</b></small>
@@ -40,18 +72,14 @@
                             <span style="font-size: 18px; font-weight: lighter">$</span>
                         </div>
                         <div class="card-footer d-flex flex-row align-items-center w-100" style="max-height: 36px; overflow: hidden">
-                            <small class="text-muted"><b>Rating:</b> <span id="pos_rating"></span></small>
-                            <span style="font-size: 24px" id="neg_rating"></span>
-                            <script>
-                                 document.getElementById("pos_rating").innerHTML=makePosRating({{ item.rating }})
-                                 document.getElementById("neg_rating").innerHTML=makeNegRating({{ item.rating }})
-                            </script>
+                            <small class="text-muted"><b>Seller ID: </b></small><small class="ms-1"><a href="/profile/?id={{ item.seller_id }}">{{ item.seller_id }}</a></small>
                         </div>
                     </div>
                     <form class="w-100 d-flex flex-row justify-content-around flex-md-column" method="post">
                         {% csrf_token %}
-                        <button class="btn {% if not user.is_authenticated %}btn-danger{% else %}btn-success{% endif %} mt-2 w-100" type="submit" name="type" value="add_to_cart"
-                        {% if in_cart and user.is_authenticated %}disabled{% endif %}>{% if in_cart and user.is_authenticated %}In Cart{% else %}Add To Cart{% endif %}</button>
+                        <button class="btn {% if not user.is_authenticated or in_cart%}btn-danger{% else %}btn-success{% endif %} mt-2 w-100" type="submit" name="type"
+                                value="{% if in_cart and user.is_authenticated %}remove_from_cart{% else %}add_to_cart{% endif %}"
+                        {% if full_cart and not in_cart %}disabled{% endif %}>{% if in_cart and user.is_authenticated %}Remove{% elif full_cart %}Cart Is Full{% else %}Add To Cart{% endif %}</button>
                     </form>
                 </div>
                 <div class="card-body pb-0 overflow-hidden">

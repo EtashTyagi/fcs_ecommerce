@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
+from Authentication.auth_handler import is_seller
 from Utils.all_urls import all_urls
 from Utils.item_handler import *
 
@@ -19,22 +20,24 @@ from Utils.item_handler import *
 
 # TODO: Track number of requests for a session, timeout if > N reqs/sec
 
-# TODO : SELLER PERMISSION
 def sell(request):
     request.session.pop('login_to_continue_to', None)
-    args = {"success": False}
+    args = {"success": False, "message": "", "allowed": is_seller(request.user)}
     if not request.user.is_authenticated:
         request.session['login_to_continue_to'] = all_urls["sell"]
         return redirect(all_urls["login"])
-    elif request.method == "GET":
-        return render(request, 'pages/sell.html', args)
-    elif request.method == "POST":
-        insert_new_item_request(request)
-        args["success"] = True
-        return render(request, 'pages/sell.html', args)
+    elif is_seller(request.user):
+        if request.method == "GET":
+            return render(request, 'pages/sell.html', args)
+        elif request.method == "POST":
+            res = insert_new_item_request(request)
+            args["success"] = res[0]
+            args["message"] = res[1]
+            return render(request, 'pages/sell.html', args)
+        else:
+            return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
     else:
-        return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
-
+        return render(request, 'pages/sell.html', args)
 
 all_views = {
     "sell": sell
