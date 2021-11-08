@@ -14,6 +14,15 @@ class NewProductRequest(models.Model):
     image_4 = models.CharField(max_length=1000, blank=True, null=True)
     image_5 = models.CharField(max_length=1000, blank=True, null=True)
     category = models.CharField(max_length=100)
+    message = models.CharField(max_length=2000)
 
     def __str__(self):
         return self.title
+
+
+class SellerRequest(models.Model):
+    buyer_id = models.IntegerField()
+    message = models.CharField(max_length=2000)
+
+    def __str__(self):
+        return self.buyer_id

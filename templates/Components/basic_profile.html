@@ -42,7 +42,7 @@
                         <button class="btn btn-primary w-100">Modify Profile</button>
                     </div>
                     <div class="mt-1 w-100">
-                        <button class="btn btn-secondary w-100">Purchases</button>
+                        <a class="btn btn-secondary w-100" href="/purchases/">Purchases</a>
                     </div>
                     {% else %}
                     <div class="mt-1 w-100">
@@ -51,12 +51,12 @@
                     {% endif %}
                     {% if group == "buyer" %}
                         <div class="mt-1 w-100">
-                            <button class="btn btn-success w-100">Become A Seller</button>
+                            <a class="btn btn-success w-100" href="/sell/">Become A Seller</a>
                         </div>
                     {% endif %}
                     {% if group == "seller" or group == "admin"%}
                         <div class="mt-1 w-100">
-                            <button class="btn btn-success w-100">Sell Panel</button>
+                            <a class="btn btn-success w-100" href="/sell/">Sell Panel</a>
                         </div>
                     {% endif %}
                     {% if group == "admin" %}
@@ -71,8 +71,7 @@
                           </button>
                           <div class="dropdown-menu dropdown-menu-dark w-100" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item" href="/item_handler/">New Item</a>
-                            <a class="dropdown-item" href="#">Update Item</a>
-                            <a class="dropdown-item" href="#">New Seller</a>
+                            <a class="dropdown-item" href="/seller_handler/">New Seller</a>
                           </div>
                         </div>
                     {% endif %}

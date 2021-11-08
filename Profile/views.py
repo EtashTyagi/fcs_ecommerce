@@ -7,6 +7,7 @@ from Cart.cart_handler import fetchCart, is_in_cart, add_to_cart, remove_from_ca
 from Utils.all_urls import all_urls
 from Utils.item_handler import *
 from Authentication.auth_handler import *
+from Utils.upload_handler import download_request_pdf_file
 
 """ Define All HTML Views To Render Here in all_views list with appropriate name"""
 """ View Format (Follow Strictly !!!!):
@@ -19,6 +20,8 @@ from Authentication.auth_handler import *
         6. When combined (POST and must be authed), handle auth inside the request type block !!
         7. After change to database using POST 'ALWAYS' redirect !!!
 """
+
+
 # TODO: Track number of requests for a session, timeout if > N reqs/sec
 
 
@@ -27,7 +30,8 @@ def profile(request):
     if request.method == "GET":
         usr_id = request.user.id
         if "id" in request.GET:
-            usr_id = request.GET["id"][-1] if len(request.GET["id"]) > 0 and request.GET["id"][-1] == '/' else request.GET["id"]
+            usr_id = request.GET["id"][-1] if len(request.GET["id"]) > 0 and request.GET["id"][-1] == '/' else \
+            request.GET["id"]
 
         if request.user.is_authenticated:
             user = User.objects.get(id=usr_id)
@@ -62,10 +66,11 @@ def admin_response_to_new_item_request_GUI(request):
             print(request.POST)
             if "response_accept" in request.POST == "response_decline" in request.POST:
                 return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
-            elif "response_accept" in request.POST and request_exists(request.POST["response_accept"]):
+            elif "response_accept" in request.POST and prod_request_exists(request.POST["response_accept"]):
                 accept_item(request.POST["response_accept"])
-            elif "response_decline" in request.POST and request_exists(request.POST["response_decline"]):
-                reject_item(request.POST["response_decline"])
+            elif "response_decline" in request.POST and prod_request_exists(request.POST["response_decline"]):
+                reject_item(request.POST["response_decline"],
+                            request.POST["message"] if "message" in request.POST else "")
             else:
                 return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
             req_items = fetch_new_item_requests()
@@ -77,31 +82,44 @@ def admin_response_to_new_item_request_GUI(request):
         return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
 
 
-def admin_response_to_update_item_request_GUI(request):
+def admin_response_to_seller_request_GUI(request):
     if request.user.is_authenticated and request.user.is_superuser:
         if request.method == "GET":
-            req_items = fetch_new_item_requests()
+            req_items = get_all_seller_requests()
             args = {"requests": req_items, "keys": list(req_items[0].keys()) if len(req_items) != 0 else []}
-            return render(request, 'pages/admin_response_to_new_item_request.html', args)
+            return render(request, 'pages/admin_response_to_seller_request.html', args)
         elif request.method == "POST":
             print(request.POST)
+            if "download" in request.POST:
+                return download_request_pdf_file(request.POST["download"])
             if "response_accept" in request.POST == "response_decline" in request.POST:
                 return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
-            elif "response_accept" in request.POST and request_exists(request.POST["response_accept"]):
-                accept_item(request.POST["response_accept"])
-            elif "response_decline" in request.POST and request_exists(request.POST["response_decline"]):
-                reject_item(request.POST["response_decline"])
+            elif "response_accept" in request.POST and seller_request_exists(request.POST["response_accept"]):
+                accept_seller_request(request.POST["response_accept"])
+            elif "response_decline" in request.POST and seller_request_exists(request.POST["response_decline"]):
+                reject_seller_request(request.POST["response_decline"],
+                                      request.POST["message"] if "message" in request.POST else "")
             else:
                 return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
-            req_items = fetch_new_item_requests()
+            req_items = get_all_seller_requests()
             args = {"requests": req_items, "keys": list(req_items[0].keys()) if len(req_items) != 0 else []}
-            return render(request, 'pages/admin_response_to_new_item_request.html', args)
+            return render(request, 'pages/admin_response_to_seller_request.html', args)
         else:
             return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+    else:
+        return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+
+
+def purchases(request):
+    if request.user.is_authenticated and (is_buyer(request.user) or is_seller(request.user) or request.user.is_superuser):
+        args = {"purchases": fetch_buyer_purchases(request.user)}
+        return render(request, "pages/buyer_purchases.html", args)
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
 
 all_views = {
     "profile": profile,
-    "admin_response_to_new_item_request": admin_response_to_new_item_request_GUI
+    "admin_response_to_new_item_request": admin_response_to_new_item_request_GUI,
+    "admin_response_to_seller_request": admin_response_to_seller_request_GUI,
+    "purchases": purchases
 }

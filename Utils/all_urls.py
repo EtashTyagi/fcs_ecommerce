@@ -6,10 +6,17 @@ all_urls = {
     "login": "/login/",
     "signup": "/signup/",
     "sell": "/sell/",
+    "sell_new": "/sell/new",
+    "sell_pending_rejected": "/sell/pending_rejected",
+    "sell_listed": "/sell/listed",
+    "sell_sold": "/sell/sold",
+    "purchases": "/purchases/",
     "item": "/item/",
     "checkout": "/checkout/",
     "profile": "/profile/",
     "logout": "/logout/",
     "search": "/search/",
-    "admin_response_to_new_item_request": "/item_handler/"
+    "admin_response_to_new_item_request": "/item_handler/",
+    "admin_response_to_seller_request": "/seller_handler/",
+
 }

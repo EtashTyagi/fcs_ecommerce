@@ -23,55 +23,30 @@
         {% endblock header %}
 </header>
 <body >
-<div class="d-flex align-items-center justify-content-center"
+<div class="d-flex align-items-center justify-content-center flex-column"
      style="background: antiquewhite; min-height:calc(100vh - 156px)">
     {% if allowed %}
-            <form class="d-flex flex-column align-items-center w-100 justify-content-center" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <span class="{% if success %}text-black{% else %}text-danger{% endif %} fw-bold h2 text-center mb-3">{{ message }}</span>
-            <label class="d-flex w-100 mt-3 flex-row" style="max-width: 410px">
-                <label class="w-50 me-1">
-                    <input id="title" class="w-100" name="title" type="text" placeholder="Product Name" required>
-                </label>
-                <label class="w-50 ms-1">
-                    <input id="title" class="w-100" name="prod_type" type="text" placeholder="Product Type" required>
-                </label>
+        <a class="btn btn-primary my-2 mt-4" style="width: 90%; max-width: 300px" href="/sell/new">Sell New Item</a>
+        <a class="btn btn-primary my-2" style="width: 90%; max-width: 300px" href="/sell/pending_rejected">
+            Pending/Rejected Items
+        </a>
+        <a class="btn btn-primary my-2" style="width: 90%; max-width: 300px" href="/sell/listed">
+            Listed Items
+        </a>
+        <a class="btn btn-primary my-2 mb-4" style="width: 90%; max-width: 300px" href="/sell/sold">
+            Sold Items
+        </a>
+    {% else %}
+        <span class="text-danger h2 text-center">{{ message }}</span>
+        <form class="d-flex flex-column align-items-center w-100 justify-content-center" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="pdf" class="d-flex w-100 mt-4 align-items-center justify-content-center flex-row" style="max-width: 410px">
+                <b>Upload Documents:</b>
+                <input id="pdf" name="pdf" accept="application/pdf" type="file" required>
             </label>
-            <label class="w-100 d-flex mt-3" style="max-width: 410px">
-                <textarea id="short_description" name="short_description" placeholder="Short Description" class="w-100"
-                 maxlength="200" required></textarea>
-            </label>
-                <label class="w-100 d-flex mt-3" style="max-width: 410px">
-                <textarea id="description" name="description" placeholder="Long Description (HTML allowed)" class="w-100"
-                maxlength="5000" required></textarea>
-            </label>
-            <label class="w-100 d-flex mt-3" style="max-width: 410px">
-                <input  id="price" name="price"
-                        step="0.01"
-                        min=0.01
-                        max=100000000
-                        class="w-100" style="max-width: 410px"
-                        type = "number"
-                        placeholder="Price"
-                        oninput="if (this.value.length === 0) return;
-                                                 if (this.value > 100000000.00) this.value = this.max;
-                                                 if (this.value < this.min) this.value = this.min;" required>
-            </label>
-                <label for="pdf" class="d-flex w-100 mt-3 align-items-center justify-content-center flex-row flex-wrap" style="max-width: 410px">
-                    <input id="title" class="w-50" name="image_1" type="text" placeholder="Google Drive image 1" required>
-                    <input id="title" class="w-50" name="image_2" type="text" placeholder="image 2" required>
-                    <input id="title" class="w-50" name="image_3" type="text" placeholder="image 3 (Optional)">
-                    <input id="title" class="w-50" name="image_4" type="text" placeholder="image 4 (Optional)">
-                    <input id="title" class="w-50" name="image_5" type="text" placeholder="image 5 (Optional)">
-                </label>
-                <label class="mt-4" style="max-width: 75%">
-                    <button class="btn btn-success mb-2" style="height: 45px;width: 125px; max-width: 100%;" type="submit">Send Request
-                    </button>
-                </label>
+            <button class="btn btn-primary mt-4" type="submit" name="seller_request">Submit Request</button>
         </form>
-{% else %}
-        <span class="text-danger fw-bold h2 text-center mb-3">You Are Not A Verified Seller.</span>
-{% endif %}
+    {% endif %}
 </div>
 </body>
 <footer>

@@ -28,7 +28,7 @@ def cart(request):
     elif request.method == "POST":
         if "remove_from_cart" in request.POST:
             removal = request.POST["remove_from_cart"]
-            if removal.isdigit() and is_in_cart(request.user, int(removal)):
+            if removal.isdecimal() and is_in_cart(request.user, int(removal)):
                 remove_from_cart(request.user, int(removal))
                 return redirect(all_urls["cart"])
             else:
