@@ -9,6 +9,10 @@ from Main import settings
 from Sell.models import SellerRequest
 from Utils.upload_handler import FileValidator, upload_request_pdf_file, delete_request_pdf_file
 
+import uuid
+from .models import User_Profile
+from django.core.mail import send_mail
+
 common_passwords = ["password", "12345678"]  # store in sql maybe?
 
 
@@ -31,8 +35,22 @@ def create_user(request):
         created.save()
         add_phone_number(created.id, phone)
         make_buyer(created)
+        auth_token = str(uuid.uuid4())
+        profile_obj = User_Profile.objects.create(user = created , auth_token = auth_token)
+        profile_obj.save()
+        send_mail_after_registration(email , auth_token)
         return [True, created]
 
+# -----------------------------------------------------------------------------------------------------------
+
+# change the below link at time of production
+
+def send_mail_after_registration(email , token):
+    subject = 'Your accounts need to be verified'
+    message = f'Hey,\n paste the link in your browser or click on it to verify your account http://127.0.0.1:8000/verify/{token}'
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = [email]
+    send_mail(subject, message , email_from ,recipient_list )
 
 def is_seller(user):
     return user.groups.filter(name='seller').exists()
