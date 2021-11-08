@@ -41,9 +41,13 @@ def create_user(request):
         send_mail_after_registration(email , auth_token)
         return [True, created]
 
+# -----------------------------------------------------------------------------------------------------------
+
+# change the below link at time of production
+
 def send_mail_after_registration(email , token):
     subject = 'Your accounts need to be verified'
-    message = f'Hi paste the link to verify your account http://127.0.0.1:8000/verify/{token}'
+    message = f'Hey,\n paste the link in your browser or click on it to verify your account http://127.0.0.1:8000/verify/{token}'
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [email]
     send_mail(subject, message , email_from ,recipient_list )
