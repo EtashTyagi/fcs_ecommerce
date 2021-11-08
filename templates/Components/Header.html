@@ -3,8 +3,8 @@
   <div class="container-fluid">
     <a class="navbar-brand" href="/">
         <div class="d-flex align-items-center justify-content-center">
-            <img alt="company Logo" height="32px" src="{% static 'res/logoPlaceHolder.png' %}">
-            <span class="h-100 ms-1" style="font-weight: 600">FCS</span>
+            <img alt="company Logo" class="img-rounded img-circle rounded-circle" height="32px" src="{% static 'res/logo.jpg' %}">
+            <span class="h-100 ms-1" style="font-weight: 600">ElectroVerse</span>
         </div>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -12,9 +12,6 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-md-0">
-        <li class="nav-item">
-          <a class="nav-link {% if active == 'Home' %}active{% endif %}" aria-current="page" href="/">Home</a>
-        </li>
         <li class="nav-item">
           <a class="nav-link {% if active == 'Store' %}active{% endif %}" href="/store">Store</a>
         </li>

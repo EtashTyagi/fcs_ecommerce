@@ -1,4 +1,6 @@
 import json
+import time
+
 import stripe
 
 from django.conf import settings
@@ -8,123 +10,72 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
-from .models import Price, stripe_Product
 from Authentication.auth_handler import is_seller, is_buyer
-
-
-
+from Utils.item_handler import reserve_item, fetchFullItem
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class CreateCheckoutSessionView(View):
     def post(self, request, *args, **kwargs):
-        price = Price.objects.get(id=self.kwargs["pk"])
-        YOUR_DOMAIN = "http://127.0.0.1:9000"  # change in production
+        item = fetchFullItem(self.kwargs["pk"])
+        YOUR_DOMAIN = "http://127.0.0.1:80"  # change in production
+        reserve_item(item["ID"])
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[
                 {
-                    'price': price.stripe_price_id,
+                    'price': item["price_id"],
                     'quantity': 1,
                 },
             ],
             mode='payment',
             success_url=YOUR_DOMAIN + '/success/',
             cancel_url=YOUR_DOMAIN + '/cancel/',
+            expires_at=(int(time.time()+3602))
         )
+        print(time.time()+60)
+        request.session["checking_out"] = True
         return redirect(checkout_session.url)
 
 
 class SuccessView(TemplateView):
     template_name = "pages/success.html"
 
+    # def post(self, request, *args, **kwargs):
+    #     if "checking_out" in request.session:
+    #         request.session.pop("checking_out")
+    #         return render(request, template_name=self.template_name)
+    #     else:
+    #         return HttpResponse("Invalid Request")
+    #
+    # def get(self, request, *args, **kwargs):
+    #     if "checking_out" in request.session:
+    #         request.session.pop("checking_out")
+    #         return render(request, template_name=self.template_name)
+    #     else:
+    #         return HttpResponse("Invalid Request")
+
 
 class CancelView(TemplateView):
     template_name = "pages/cancel.html"
 
+    def post(self, request, *args, **kwargs):
+        if "checking_out" in request.session:
+            request.session.pop("checking_out")
+            return render(request, template_name=self.template_name)
+        else:
+            return HttpResponse("Invalid Request")
 
-class ProductLandingPageView(TemplateView):
-    template_name = "pages/landing.html"
-
-    # def post(self, request, *args, **kwargs):
-    #     print("chal jaa",args,kwargs)
-    #     return None
-
-    # def get(self, request, *args, **kwargs):
-    #     print("chal jaa",args,kwargs)
-    #     return
-    
-    
-
-    def get_context_data(self, **kwargs):
-        print("hehe" , kwargs)
-
-        product = stripe_Product.objects.get(name="MSI GF75 Thin")
-        prices = Price.objects.filter(product=product)
-        context = super(ProductLandingPageView,
-                        self).get_context_data(**kwargs)
-        context.update({
-            "product": product,
-            "prices": prices,
-        })
-        return context
+    def get(self, request, *args, **kwargs):
+        if "checking_out" in request.session:
+            request.session.pop("checking_out")
+            return render(request, template_name=self.template_name)
+        else:
+            return HttpResponse("Invalid Request")
 
 
-@csrf_exempt
-def stripe_webhook(request):
-    payload = request.body
-    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
-    event = None
 
-    try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
-        )
-    except ValueError as e:
-        # Invalid payload
-        return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as e:
-        # Invalid signature
-        return HttpResponse(status=400)
-
-    # Handle the checkout.session.completed event
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-        customer_email = session["customer_details"]["email"]
-        line_items = stripe.checkout.Session.list_line_items(session["id"])
-
-        stripe_price_id = line_items["data"][0]["price"]["id"]
-        price = Price.objects.get(stripe_price_id=stripe_price_id)
-        product = price.product
-
-        send_mail(
-            subject="Here is your product",
-            message=f"Thanks for your purchase. ",#The URL is: {product.url}",
-            recipient_list=[customer_email],
-            from_email="fcs_group@email.com"
-        )
-
-    elif event["type"] == "payment_intent.succeeded":
-        intent = event['data']['object']
-
-        stripe_customer_id = intent["customer"]
-        stripe_customer = stripe.Customer.retrieve(stripe_customer_id)
-
-        customer_email = stripe_customer['email']
-        price_id = intent["metadata"]["price_id"]
-
-        price = Price.objects.get(id=price_id)
-        product = price.product
-
-        send_mail(
-            subject="Here is your product",
-            message=f"Thanks for your purchase.",# The URL is {product.url}",
-            recipient_list=[customer_email],
-            from_email="fcs_group@email.com"
-        )
-
-    return HttpResponse(status=200)
 
 
 class StripeIntentView(View):
@@ -132,7 +83,7 @@ class StripeIntentView(View):
         try:
             req_json = json.loads(request.body)
             customer = stripe.Customer.create(email=req_json['email'])
-            price = Price.objects.get(id=self.kwargs["pk"])
+            price = get_item_by_priceID(self.kwargs["pk"])
             intent = stripe.PaymentIntent.create(
                 amount=price.price,
                 currency='usd',
@@ -149,7 +100,7 @@ class StripeIntentView(View):
 
 
 class CustomPaymentView(TemplateView):
-    template_name = "custom_payment.html"
+    template_name = "pages/custom_payment.html"
 
     def get_context_data(self, **kwargs):
         product = stripe_Product.objects.get(name="MSI GF75 Thin")
@@ -163,8 +114,4 @@ class CustomPaymentView(TemplateView):
         return context
 
 
-
-# def landing(request):   
-#     if request.method == "POST" and request.user.is_authenticated  and (is_buyer(request.user) or is_seller(request.user) or request.user.is_superuser):
-#         print("cvsgah")
-
+all_views = {}

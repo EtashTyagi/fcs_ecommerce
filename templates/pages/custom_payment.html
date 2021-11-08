@@ -197,9 +197,7 @@
                 <h3>{{ product.name }}</h3>
                 <hr />
                 <select id="prices">
-                    {% for price in prices %}
-                    <option value="{{ price.id }}">${{ price.get_display_price }}</option>
-                    {% endfor %}
+                    <option value="{{ price.id }}"> ₹{{ price.get_display_price }}</option>
                 </select>
             </div>
 

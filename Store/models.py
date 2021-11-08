@@ -13,6 +13,8 @@ class Product(models.Model):
     image_4 = models.CharField(max_length=1000, blank=True, null=True)
     image_5 = models.CharField(max_length=1000, blank=True, null=True)
     available_quantity = models.IntegerField()
+    stripe_prod_id = models.CharField(max_length=100,  primary_key=True)
+    stripe_price_id = models.CharField(max_length=100)
     category = models.CharField(max_length=100)
 
     def __str__(self):

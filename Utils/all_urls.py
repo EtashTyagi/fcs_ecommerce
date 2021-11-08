@@ -11,6 +11,8 @@ all_urls = {
     "sell_listed": "/sell/listed",
     "sell_sold": "/sell/sold",
     "purchases": "/purchases/",
+    "custom_payment": "/payment/",
+    "cancel": "/payment/cancel",
     "item": "/item/",
     "checkout": "/checkout/",
     "profile": "/profile/",

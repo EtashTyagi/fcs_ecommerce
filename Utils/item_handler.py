@@ -4,8 +4,10 @@
 from django.db import connection
 
 from Cart.models import Transaction
+from Main import settings
 from Store.models import Product
 from Sell.models import NewProductRequest
+import stripe
 
 # Return None for invalid request
 
@@ -18,7 +20,7 @@ from Sell.models import NewProductRequest
 
 def fetchCategories():
     categories = []
-    for prod in Product.objects.raw('SELECT DISTINCT(category), 1 id FROM store_product'):
+    for prod in Product.objects.raw('SELECT DISTINCT(category), 1 stripe_prod_id FROM store_product'):
         categories.append(prod.category.title())
     return categories
 
@@ -30,7 +32,7 @@ def fetchItems(request, search_in=("title",), limit=float('inf')):
     if len(request.GET["q"]) > 0 and request.GET["q"][-1] == '/' else request.GET["q"]) + '%').lower()
     category = ("" if "c" not in request.GET else request.GET["c"][:-1]
     if len(request.GET["c"]) > 0 and request.GET["c"][-1] == '/' else request.GET["c"]).lower()
-    sh_item = lambda product: {'ID': str(prod.id),
+    sh_item = lambda product: {'ID': str(prod.stripe_prod_id),
                                'image': prod.image_1,
                                'title': prod.title,
                                'short_description': prod.short_description,
@@ -41,53 +43,54 @@ def fetchItems(request, search_in=("title",), limit=float('inf')):
     if "title" in search_in:
         if category == "":
             for prod in Product.objects.raw(
-                    'SELECT id, title, image_1, short_description, price, category, seller_uid FROM store_product WHERE LOWER(title) LIKE %s limit %s',
+                    'SELECT stripe_prod_id, title, image_1, short_description, price, category, seller_uid, stripe_prod_id FROM store_product WHERE LOWER(title) LIKE %s limit %s',
                     [q_string, get_limits() - len(result_fetch)]):
                 result_fetch.append(sh_item(prod))
-                done_ids.add(prod.id)
+                done_ids.add(prod.stripe_prod_id)
         else:
             for prod in Product.objects.raw(
-                    'SELECT id, title, image_1, short_description, price, category, seller_uid FROM store_product WHERE LOWER(title) LIKE %s AND LOWER(category)=%s limit %s',
+                    'SELECT stripe_prod_id, title, image_1, short_description, price, category, seller_uid, stripe_prod_id FROM store_product WHERE LOWER(title) LIKE %s AND LOWER(category)=%s limit %s',
                     [q_string, category, get_limits() - len(result_fetch)]):
                 result_fetch.append(sh_item(prod))
-                done_ids.add(prod.id)
+                done_ids.add(prod.stripe_prod_id)
     if "short_description" in search_in:
         if category == "":
             for prod in Product.objects.raw(
-                    'SELECT id, title, image_1, short_description, price, category, seller_uid  FROM store_product WHERE LOWER(short_description) LIKE %s limit %s',
+                    'SELECT stripe_prod_id, title, image_1, short_description, price, category, seller_uid, stripe_prod_id  FROM store_product WHERE LOWER(short_description) LIKE %s limit %s',
                     [q_string, get_limits() - len(result_fetch)]):
-                if prod.id not in done_ids:
+                if prod.stripe_prod_id not in done_ids:
                     result_fetch.append(sh_item(prod))
-                    done_ids.add(prod.id)
+                    done_ids.add(prod.stripe_prod_id)
         else:
             for prod in Product.objects.raw(
-                    'SELECT id, title, image_1, short_description, price, category, seller_uid FROM store_product WHERE LOWER(short_description) LIKE %s AND LOWER(category)=%s limit %s',
+                    'SELECT stripe_prod_id, title, image_1, short_description, price, category, seller_uid, stripe_prod_id FROM store_product WHERE LOWER(short_description) LIKE %s AND LOWER(category)=%s limit %s',
                     [q_string, category, get_limits() - len(result_fetch)]):
-                if prod.id not in done_ids:
+                if prod.stripe_prod_id not in done_ids:
                     result_fetch.append(sh_item(prod))
-                    done_ids.add(prod.id)
+                    done_ids.add(prod.stripe_prod_id)
     if "description" in search_in:
         if category == "":
             for prod in Product.objects.raw(
-                    'SELECT id, title, image_1, short_description, price, category, seller_uid FROM store_product WHERE LOWER(description) LIKE %s limit %s',
+                    'SELECT stripe_prod_id, title, image_1, short_description, price, category, seller_uid, stripe_prod_id FROM store_product WHERE LOWER(description) LIKE %s limit %s',
                     [q_string, get_limits() - len(result_fetch)]):
-                if prod.id not in done_ids:
+                if prod.stripe_prod_id not in done_ids:
                     result_fetch.append(sh_item(prod))
-                    done_ids.add(prod.id)
+                    done_ids.add(prod.stripe_prod_id)
         else:
             for prod in Product.objects.raw(
-                    'SELECT id, title, image_1, short_description, price, category, seller_uid FROM store_product WHERE LOWER(description) LIKE %s AND LOWER(category)=%s  limit %s',
+                    'SELECT stripe_prod_id, title, image_1, short_description, price, category, seller_uid, stripe_prod_id FROM store_product WHERE LOWER(description) LIKE %s AND LOWER(category)=%s  limit %s',
                     [q_string, category, get_limits() - len(result_fetch)]):
-                if prod.id not in done_ids:
+                if prod.stripe_prod_id not in done_ids:
                     result_fetch.append(sh_item(prod))
-                    done_ids.add(prod.id)
+                    done_ids.add(prod.stripe_prod_id)
     return result_fetch
 
 
 # Return None for invalid request
 def fetchFullItem(itemID):
     for prod in Product.objects.raw(
-            'SELECT id, title, image_1, image_2, image_3, image_4, image_5, description, price, seller_uid FROM store_product WHERE store_product.id=%s',
+            """SELECT stripe_prod_id, title, image_1, image_2, image_3, image_4, image_5, description, price, 
+            seller_uid, stripe_price_id FROM store_product WHERE store_product.stripe_prod_id=%s""",
             [itemID]):
         return {
             'ID': str(itemID),
@@ -99,6 +102,7 @@ def fetchFullItem(itemID):
             'title': prod.title,
             'description': prod.description,
             'price': str(prod.price),
+            'price_id': str(prod.stripe_price_id),
             'seller_id': str(prod.seller_uid)
         }
     return None
@@ -160,13 +164,20 @@ def accept_item(id):
     for prod in NewProductRequest.objects.raw(
             'SELECT id, seller_uid, title, short_description, description, price, category, image_1, image_2, image_3, image_4, image_5 FROM sell_newproductrequest WHERE id=%s LIMIT 1',
             [id]):
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        stripe_prod = stripe.Product.create(name=str(prod.title) + "[" + str(prod.id) + "]",
+                                            description=prod.short_description)
+        stripe_price = stripe.Price.create(unit_amount=int(float(prod.price) * 100.0),
+                                           currency="inr",
+                                           product=stripe_prod["id"], )
         with connection.cursor() as cursor:
             cursor.execute("""INSERT INTO store_product
-            (seller_uid, title, short_description, description, price, category, image_1, image_2, image_3, image_4, image_5, available_quantity)
-             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)""",
+            (seller_uid, title, short_description, description, price, category, image_1, image_2, image_3, image_4, 
+            image_5, available_quantity, stripe_prod_id, stripe_price_id)
+             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s)""",
                            [prod.seller_uid, prod.title, prod.short_description,
                             prod.description, prod.price, prod.category, prod.image_1, prod.image_2,
-                            prod.image_3, prod.image_4, prod.image_5])
+                            prod.image_3, prod.image_4, prod.image_5, stripe_prod["id"], stripe_price["id"]])
     with connection.cursor() as cursor:
         cursor.execute("""DELETE FROM sell_newproductrequest WHERE id=%s""", [id])
 
@@ -179,7 +190,9 @@ def reject_item(id, message):
 
 def delete_product(id, user):
     with connection.cursor() as cursor:
-        cursor.execute("""DELETE FROM store_product WHERE id=%s AND seller_uid=%s AND available_quantity=%s""", [id, user.id, "0"])
+        cursor.execute(
+            """DELETE FROM store_product WHERE stripe_prod_id=%s AND seller_uid=%s AND available_quantity=0""",
+            [id, user.id])
     return True
 
 
@@ -187,7 +200,9 @@ def update_inventory(to_add, user, item_id):
     to_add = int(to_add) if str(to_add).isdecimal() else 0
     if 0 < to_add < 100:
         with connection.cursor() as cursor:
-            cursor.execute("""UPDATE store_product SET available_quantity=available_quantity+%s  WHERE id=%s AND seller_uid=%s""", [to_add, item_id, user.id])
+            cursor.execute(
+                """UPDATE store_product SET available_quantity=available_quantity+%s  WHERE stripe_prod_id=%s AND seller_uid=%s""",
+                [to_add, item_id, user.id])
         return True
     else:
         return False
@@ -232,10 +247,10 @@ def fetch_item_request_for_user(user):
 def fetch_seller_listed_items(user):
     items = []
     for prod in Product.objects.raw(
-            'SELECT id, title, image_1, short_description, price, category, seller_uid, available_quantity FROM store_product WHERE seller_uid=%s',
+            'SELECT stripe_prod_id, title, image_1, short_description, price, category, seller_uid, available_quantity FROM store_product WHERE seller_uid=%s',
             [user.id]):
         items.append({
-            'ID': str(prod.id),
+            'ID': str(prod.stripe_prod_id),
             'image_1': prod.image_1,
             'image_2': prod.image_2,
             'image_3': prod.image_3,
@@ -256,7 +271,8 @@ def fetch_seller_sales(seller):
     for prod in Transaction.objects.raw(
             'SELECT id, seller_id, buyer_id, item_id, price FROM cart_transaction WHERE seller_id=%s',
             [seller.id]):
-        sales.append({"Sno": ++index, "Seller": prod.seller_id, "Buyer": prod.buyer_id, "Item": prod.item_id, "Price": prod.price})
+        sales.append({"Sno": ++index, "Seller": prod.seller_id, "Buyer": prod.buyer_id, "Item": prod.item_id,
+                      "Price": prod.price})
     return sales
 
 
@@ -266,5 +282,34 @@ def fetch_buyer_purchases(buyer):
     for prod in Transaction.objects.raw(
             'SELECT id, seller_id, buyer_id, item_id, price FROM cart_transaction WHERE buyer_id=%s',
             [buyer.id]):
-        purchases.append({"Sno": ++index, "Seller": prod.seller_id, "Buyer": prod.buyer_id, "Item": prod.item_id, "Price": prod.price})
+        purchases.append({"Sno": ++index, "Seller": prod.seller_id, "Buyer": prod.buyer_id, "Item": prod.item_id,
+                          "Price": prod.price})
     return purchases
+
+
+def reserve_item(itemID):
+    for prod in Product.objects.raw(
+            """SELECT stripe_prod_id, title, image_1, image_2, image_3, image_4, image_5, description, price, 
+            seller_uid, available_quantity FROM store_product WHERE store_product.stripe_prod_id=%s""",
+            [itemID]):
+        with connection.cursor() as cursor:
+            if prod.available_quantity > 0:
+                cursor.execute(
+                    """UPDATE store_product SET available_quantity=available_quantity-1  WHERE stripe_prod_id=%s""",
+                    [itemID])
+                return True
+    return False
+
+
+def failed_un_reserve(itemID):
+    for prod in Product.objects.raw(
+            """SELECT stripe_prod_id, title, image_1, image_2, image_3, image_4, image_5, description, price, 
+            seller_uid, available_quantity FROM store_product WHERE store_product.stripe_prod_id=%s""",
+            [itemID]):
+        with connection.cursor() as cursor:
+            if prod.available_quantity > 0:
+                cursor.execute(
+                    """UPDATE store_product SET available_quantity=available_quantity+1  WHERE stripe_prod_id=%s""",
+                    [itemID])
+                return True
+    return False

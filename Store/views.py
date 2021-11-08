@@ -1,3 +1,4 @@
+import stripe
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from Cart.cart_handler import is_in_cart, add_to_cart, remove_from_cart, cart_is_full

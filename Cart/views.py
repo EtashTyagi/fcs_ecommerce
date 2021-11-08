@@ -1,5 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+
+from Authentication.auth_handler import is_seller, is_buyer
 from Cart.cart_handler import fetchCart, is_in_cart, remove_from_cart
 from Utils.all_urls import all_urls
 
@@ -19,20 +21,27 @@ from Utils.all_urls import all_urls
 
 def cart(request):
     request.session.pop('login_to_continue_to', None)
-    args = {"item": fetchCart(request.user)}
     if not request.user.is_authenticated:
         request.session['login_to_continue_to'] = all_urls["cart"]
         return redirect(all_urls["login"])
+    elif (not is_seller(request.user)) and (not is_buyer(request.user)):
+        return HttpResponse("<h1>Error</h1><p>Account Not Verified</p>")
     elif request.method == "GET":
+        args = {"items": fetchCart(request.user)}
+        args["tot_price"] = 0
+        for item in args["items"]:
+            args["tot_price"] += float(item["price"])
         return render(request, 'pages/cart.html', args)
     elif request.method == "POST":
         if "remove_from_cart" in request.POST:
             removal = request.POST["remove_from_cart"]
-            if removal.isdecimal() and is_in_cart(request.user, int(removal)):
-                remove_from_cart(request.user, int(removal))
+            if is_in_cart(request.user, removal):
+                remove_from_cart(request.user, removal)
                 return redirect(all_urls["cart"])
             else:
                 return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+        elif "checkout" in request.POST:
+            return "BRUH"
         else:
             return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
     else:
