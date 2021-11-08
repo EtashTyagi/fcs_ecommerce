@@ -27,8 +27,7 @@ def cart(request):
     elif (not is_seller(request.user)) and (not is_buyer(request.user)):
         return HttpResponse("<h1>Error</h1><p>Account Not Verified</p>")
     elif request.method == "GET":
-        args = {"items": fetchCart(request.user)}
-        args["tot_price"] = 0
+        args = {"items": fetchCart(request.user), "tot_price": 0}
         for item in args["items"]:
             args["tot_price"] += float(item["price"])
         return render(request, 'pages/cart.html', args)
@@ -40,8 +39,6 @@ def cart(request):
                 return redirect(all_urls["cart"])
             else:
                 return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
-        elif "checkout" in request.POST:
-            return "BRUH"
         else:
             return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
     else:

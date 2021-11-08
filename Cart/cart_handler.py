@@ -1,6 +1,7 @@
 # TODO: CHECK IF ITEMS ARE IN STOCK, SHOW NUMBER OF ITEMS IN STOCK
 from django.db import connection
 
+from Cart.models import Transaction
 from Store.models import Product
 
 
@@ -33,8 +34,12 @@ def add_to_cart(user, productID):
 
 
 def remove_from_cart(user, productID):
+    _remove_from_cart(user.id, productID)
+
+
+def _remove_from_cart(userID, productID):
     with connection.cursor() as cursor:
-        cursor.execute("DELETE FROM cart where user_id=%s and product_id=%s;", [user.id, productID])
+        cursor.execute("DELETE FROM cart where user_id=%s and product_id=%s;", [userID, productID])
 
 
 def cart_is_full(user):
@@ -46,3 +51,25 @@ def cart_is_full(user):
         if cnt == 10:
             return True
     return False
+
+
+def insert_new_transaction(seller_id, item_id, buyer_id, price, stripe_transaction_id):
+    with connection.cursor() as cursor:
+        cursor.execute("""INSERT INTO cart_transaction(seller_id, item_id, buyer_id, price, stripe_transaction_id, status) 
+        VALUES (%s, %s, %s, %s, %s, %s)""", [seller_id, item_id, buyer_id, price, stripe_transaction_id, "Pending"])
+
+
+def fail_transaction(stripe_transaction_id):
+    with connection.cursor() as cursor:
+        cursor.execute("""UPDATE cart_transaction SET status=%s WHERE stripe_transaction_id=%s """,
+                       ["Failed", stripe_transaction_id])
+
+
+def succeed_transaction(stripe_transaction_id):
+    with connection.cursor() as cursor:
+        cursor.execute("""UPDATE cart_transaction SET status=%s WHERE stripe_transaction_id=%s """,
+                       ["Successful", stripe_transaction_id])
+    for prod in Transaction.objects.raw(
+            'SELECT stripe_transaction_id, seller_id, buyer_id, item_id, price, status FROM cart_transaction WHERE stripe_transaction_id=%s',
+            [stripe_transaction_id]):
+        _remove_from_cart(prod.buyer_id, prod.item_id)

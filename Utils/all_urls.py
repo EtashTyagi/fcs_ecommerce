@@ -1,3 +1,4 @@
+# Except payment gateway
 all_urls = {
     "admin": "/admin/",
     "cart": "/cart/",

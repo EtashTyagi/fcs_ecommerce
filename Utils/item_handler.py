@@ -266,24 +266,30 @@ def fetch_seller_listed_items(user):
 
 
 def fetch_seller_sales(seller):
-    sales = []
-    index = 0
+    purchases = []
     for prod in Transaction.objects.raw(
-            'SELECT id, seller_id, buyer_id, item_id, price FROM cart_transaction WHERE seller_id=%s',
+            'SELECT stripe_transaction_id, seller_id, buyer_id, item_id, price, status FROM cart_transaction WHERE seller_id=%s',
             [seller.id]):
-        sales.append({"Sno": ++index, "Seller": prod.seller_id, "Buyer": prod.buyer_id, "Item": prod.item_id,
-                      "Price": prod.price})
-    return sales
+        purchases.append({"Sno": prod.stripe_transaction_id,
+                          "Seller": prod.seller_id,
+                          "Buyer": prod.buyer_id,
+                          "Item": prod.item_id,
+                          "Price": prod.price,
+                          "status": prod.status})
+    return purchases
 
 
 def fetch_buyer_purchases(buyer):
     purchases = []
-    index = 0
     for prod in Transaction.objects.raw(
-            'SELECT id, seller_id, buyer_id, item_id, price FROM cart_transaction WHERE buyer_id=%s',
+            'SELECT stripe_transaction_id, seller_id, buyer_id, item_id, price, status FROM cart_transaction WHERE buyer_id=%s',
             [buyer.id]):
-        purchases.append({"Sno": ++index, "Seller": prod.seller_id, "Buyer": prod.buyer_id, "Item": prod.item_id,
-                          "Price": prod.price})
+        purchases.append({"Sno": prod.stripe_transaction_id,
+                          "Seller": prod.seller_id,
+                          "Buyer": prod.buyer_id,
+                          "Item": prod.item_id,
+                          "Price": prod.price,
+                          "status": prod.status})
     return purchases
 
 

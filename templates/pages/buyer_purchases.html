@@ -25,30 +25,34 @@
 <body >
 <div class="d-flex align-items-center flex-column"
      style="background: antiquewhite; min-height:calc(100vh - 156px)">
-        <div class="d-flex flex-column align-items-center justify-content-center pb-3 my-2 mt-4" style="width:90%; max-width: 1000px">
+        <div class="d-flex flex-column align-items-center justify-content-center pb-3 my-2 mt-4" style="width:90%; max-width: 1250px">
             <span class="text-black fw-bold h1 w-100 text-start mb-2">Your Purchases</span>
-            <table class="table table-hover table-bordered table-light">
-                <thead class="table-dark">
-                  <tr>
-                      <th scope="col">S.no</th>
-                      <th scope="col">Buyer</th>
-                      <th scope="col">Seller</th>
-                      <th scope="col">Item</th>
-                      <th scope="col">Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for purchase in purchases %}
-                  <tr>
-                      <th scope="row">{{ purchase.Sno }}</th>
-                      <td>{% if purchase.Buyer %}<a href="/profile/?id=">{{ purchase.Buyer }}</a>{% else %}Removed{% endif %}</td>
-                      <td>{% if purchase.Seller %}<a href="/profile/?id=">{{ purchase.Seller }}</a>{% else %}Removed{% endif %}</td>
-                      <td>{% if purchase.Item %}<a href="/profile/?id=">{{ purchase.Item }}</a>{% else %}Removed{% endif %}</td>
-                      <td>{{ purchase.Price }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-responsive w-100">
+                <table class="table table-hover table-bordered table-light">
+                    <thead class="table-dark">
+                      <tr>
+                          <th scope="col">ID</th>
+                          <th scope="col">Buyer</th>
+                          <th scope="col">Seller</th>
+                          <th scope="col">Item</th>
+                          <th scope="col">Price</th>
+                          <th scope="col">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for purchase in purchases %}
+                      <tr>
+                          <td>{{ purchase.Sno }}</td>
+                          <td>{% if purchase.Buyer %}<a href="/profile/?id={{ purchase.Buyer  }}">{{ purchase.Buyer }}</a>{% else %}Removed{% endif %}</td>
+                          <td>{% if purchase.Seller %}<a href="/profile/?id={{ purchase.Seller }}">{{ purchase.Seller }}</a>{% else %}Removed{% endif %}</td>
+                          <td>{% if purchase.Item %}<a href="/item/?id={{ purchase.Item }}">{{ purchase.Item }}</a>{% else %}Removed{% endif %}</td>
+                          <td>{{ purchase.Price }}</td>
+                          <td>{{ purchase.status }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
 </div>
