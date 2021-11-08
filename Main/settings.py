@@ -96,7 +96,7 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': 'Iam@8447',
     }
 }
 
@@ -136,6 +136,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STRIPE_PUBLIC_KEY = "pk_test_51JkPoKSBGHFum3RMzBSmkN39OdabCvtmEhxl979BGkFj9QKzpWyI9K91YTJSWEKqr7RrzBPLJGkolDqA85S98Ix4008pzSzFJg"
+STRIPE_SECRET_KEY = "sk_test_51JkPoKSBGHFum3RMJIqC2NVQfSNoZK3vpFTvvZSyE9S3R67RURuC1DWTobnGGzFQEKzOulG89pMhuwg6wLxfb6LM00eGwcEEjO"
+STRIPE_WEBHOOK_SECRET = ""
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
@@ -148,5 +152,5 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 10  # 1M
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024  # 1M
 FILE_UPLOAD_MAX_MEMORY_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE

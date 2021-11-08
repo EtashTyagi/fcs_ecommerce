@@ -1,14 +1,23 @@
-"""Main URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Write a renderer in views and include it in all_views dictionary with relevant info
-"""
+from django.contrib import admin
 from django.urls import path
-from PaymentGateway.views import all_views
-from Utils.all_urls import all_urls
+from .views import (
+    CreateCheckoutSessionView,
+    SuccessView,
+    CancelView,
+    ProductLandingPageView,
+    stripe_webhook,
+    StripeIntentView,
+    CustomPaymentView
+)
 
-urlpatterns = [path(all_urls[key][1:], all_views[key]) for key in all_views.keys()]
+urlpatterns = [
+    path('landing/', ProductLandingPageView.as_view(), name='landing'),
+    path('cancel/', CancelView.as_view(), name='cancel'),
+    path('success/', SuccessView.as_view(), name='success'),
+    path('create-checkout-session/<pk>/',
+         CreateCheckoutSessionView.as_view(), name='create-checkout-session'),
+    path('webhooks/stripe/', stripe_webhook, name='stripe-webhook'),
+    path('create-payment-intent/<pk>/',
+         StripeIntentView.as_view(), name='create-payment-intent'),
+    path('custom-payment/', CustomPaymentView.as_view(), name='custom-payment')
+]

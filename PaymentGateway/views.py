@@ -1,23 +1,170 @@
-from django.shortcuts import render
+import json
+import stripe
 
-""" Define All HTML Views To Render Here in all_views list with appropriate name"""
-""" View Format (Follow Strictly !!!!):
-        0. Handle invalid requests (eg in item.)
-        1. Handle tasks dependent on auth of user (only authed user can do some tasks)
-        2. Handle permissions (only seller can sell)
-        3. Handle GET request
-        4. Handle POST request
-        5. Else return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
-        6. When combined (POST and must be authed), handle auth inside the request type block !!
-        7. After change to database using POST 'ALWAYS' redirect !!!
-"""
-# TODO: Track number of requests for a session, timeout if > N reqs/sec
+from django.conf import settings
+from django.core.mail import send_mail
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView
+from .models import Price, stripe_Product
+from Authentication.auth_handler import is_seller, is_buyer
 
 
-# TODO: Extremely important, validate if can checkout (stock, positive items, ....)
-def checkout(request):
-    return render(request, 'pages/checkout.html')
 
-all_views = {
-    "checkout": checkout
-}
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+class CreateCheckoutSessionView(View):
+    def post(self, request, *args, **kwargs):
+        price = Price.objects.get(id=self.kwargs["pk"])
+        YOUR_DOMAIN = "http://127.0.0.1:9000"  # change in production
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price': price.stripe_price_id,
+                    'quantity': 1,
+                },
+            ],
+            mode='payment',
+            success_url=YOUR_DOMAIN + '/success/',
+            cancel_url=YOUR_DOMAIN + '/cancel/',
+        )
+        return redirect(checkout_session.url)
+
+
+class SuccessView(TemplateView):
+    template_name = "pages/success.html"
+
+
+class CancelView(TemplateView):
+    template_name = "pages/cancel.html"
+
+
+class ProductLandingPageView(TemplateView):
+    template_name = "pages/landing.html"
+
+    # def post(self, request, *args, **kwargs):
+    #     print("chal jaa",args,kwargs)
+    #     return None
+
+    # def get(self, request, *args, **kwargs):
+    #     print("chal jaa",args,kwargs)
+    #     return
+    
+    
+
+    def get_context_data(self, **kwargs):
+        print("hehe" , kwargs)
+
+        product = stripe_Product.objects.get(name="MSI GF75 Thin")
+        prices = Price.objects.filter(product=product)
+        context = super(ProductLandingPageView,
+                        self).get_context_data(**kwargs)
+        context.update({
+            "product": product,
+            "prices": prices,
+        })
+        return context
+
+
+@csrf_exempt
+def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    event = None
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+        )
+    except ValueError as e:
+        # Invalid payload
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        return HttpResponse(status=400)
+
+    # Handle the checkout.session.completed event
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        customer_email = session["customer_details"]["email"]
+        line_items = stripe.checkout.Session.list_line_items(session["id"])
+
+        stripe_price_id = line_items["data"][0]["price"]["id"]
+        price = Price.objects.get(stripe_price_id=stripe_price_id)
+        product = price.product
+
+        send_mail(
+            subject="Here is your product",
+            message=f"Thanks for your purchase. ",#The URL is: {product.url}",
+            recipient_list=[customer_email],
+            from_email="fcs_group@email.com"
+        )
+
+    elif event["type"] == "payment_intent.succeeded":
+        intent = event['data']['object']
+
+        stripe_customer_id = intent["customer"]
+        stripe_customer = stripe.Customer.retrieve(stripe_customer_id)
+
+        customer_email = stripe_customer['email']
+        price_id = intent["metadata"]["price_id"]
+
+        price = Price.objects.get(id=price_id)
+        product = price.product
+
+        send_mail(
+            subject="Here is your product",
+            message=f"Thanks for your purchase.",# The URL is {product.url}",
+            recipient_list=[customer_email],
+            from_email="fcs_group@email.com"
+        )
+
+    return HttpResponse(status=200)
+
+
+class StripeIntentView(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            req_json = json.loads(request.body)
+            customer = stripe.Customer.create(email=req_json['email'])
+            price = Price.objects.get(id=self.kwargs["pk"])
+            intent = stripe.PaymentIntent.create(
+                amount=price.price,
+                currency='usd',
+                customer=customer['id'],
+                metadata={
+                    "price_id": price.id
+                }
+            )
+            return JsonResponse({
+                'clientSecret': intent['client_secret']
+            })
+        except Exception as e:
+            return JsonResponse({'error': str(e)})
+
+
+class CustomPaymentView(TemplateView):
+    template_name = "custom_payment.html"
+
+    def get_context_data(self, **kwargs):
+        product = stripe_Product.objects.get(name="MSI GF75 Thin")
+        prices = Price.objects.filter(product=product)
+        context = super(CustomPaymentView, self).get_context_data(**kwargs)
+        context.update({
+            "product": product,
+            "prices": prices,
+            "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY
+        })
+        return context
+
+
+
+# def landing(request):   
+#     if request.method == "POST" and request.user.is_authenticated  and (is_buyer(request.user) or is_seller(request.user) or request.user.is_superuser):
+#         print("cvsgah")
+
