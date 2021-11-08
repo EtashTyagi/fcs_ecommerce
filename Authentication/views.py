@@ -2,6 +2,8 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from Authentication.auth_handler import *
 from Utils.all_urls import all_urls
+from .models import User_Profile
+from django.contrib import messages
 
 """ Define All HTML Views To Render Here in all_views list with appropriate name"""
 """ View Format (Follow Strictly !!!!):
@@ -65,7 +67,8 @@ def signup(request):
         else:
             args["user"] = response[1]
         request.session['redirect_from_signup'] = True
-        return redirect(all_urls["login"])
+        # return redirect(all_urls["login"])
+        return redirect(all_urls["email_token"])
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
 
@@ -75,9 +78,40 @@ def logout(request):
     logout_user(request)
     return redirect(all_urls["home"])
 
+def email_token(request):
+    return render(request, 'pages/token_send.html')
+
+def email_verified(request):
+    return render(request , 'pages/email_verified.html')
+
+def verify(request , auth_token):
+    try:
+        profile_obj = User_Profile.objects.filter(auth_token = auth_token).first()
+    
+
+        if profile_obj:
+            if profile_obj.is_verified:
+                messages.success(request, 'Your account is already verified.')
+                return redirect(all_urls["login"])
+            profile_obj.is_verified = True
+            profile_obj.save()
+            messages.success(request, 'Your account has been verified.')
+            return redirect(all_urls["login"])
+        else:
+            return redirect('/error')
+    except Exception as e:
+        print(e)
+        return redirect('/')
+
+def error_page(request):
+    return  render(request , 'pages/error_page.html')
 
 all_views = {
     "login": login,
     "signup": signup,
-    "logout": logout
+    "logout": logout,
+    "email_token":email_token,
+    "email_verified":email_verified,
+    "verify_token":verify,
+    "verification_error":error_page
 }
