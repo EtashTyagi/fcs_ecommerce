@@ -34,7 +34,6 @@ def create_user(request):
         created.last_name = last_name
         created.save()
         add_phone_number(created.id, phone)
-        make_buyer(created)
         auth_token = str(uuid.uuid4())
         profile_obj = User_Profile.objects.create(user = created , auth_token = auth_token)
         profile_obj.save()

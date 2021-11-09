@@ -90,10 +90,10 @@ def verify(request , auth_token):
     
 
         if profile_obj:
-            if profile_obj.is_verified:
+            if is_buyer(profile_obj.user) or is_seller(profile_obj.user):
                 # messages.success(request, 'Your account is already verified.')
                 return redirect(all_urls["login"])
-            profile_obj.is_verified = True
+            make_buyer(profile_obj.user)
             profile_obj.save()
             # messages.success(request, 'Your account has been verified.')
             return redirect(all_urls["login"])
