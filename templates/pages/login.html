@@ -54,9 +54,23 @@
             </label>
             <div class="d-flex flex-column align-items-center mt-2 w-100" href="/">
                 <label style="max-width: 75%">
-                    <button class="btn btn-success" style=" width: 125px; max-width: 100%;" type="submit">Log In
+                    <button class="btn btn-success" style=" width: 125px; max-width: 100%;" type="submit" data-toggle="modal" data-target="#modal_login" id="modal_button_login">
+                        Log In
                     </button>
                 </label>
+                <div class="modal fade" id="modal_login" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel_login" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel_login">Processing Request</h5>
+                              </div>
+                              <div class="modal-body">
+                                Please Wait!
+                              </div>
+                            </div>
+                        </div>
+                </div>
+
                 <label class="my-2" style="max-width: 75%">
                     <a  href="/signup" style="text-decoration: none"><button class="btn btn-primary" style=" width: 125px; max-width: 100%;" type="button">Sign Up
                     </button></a>

@@ -32,36 +32,21 @@
         <span style="font-size: xx-large; font-weight: bold">
           Enter OTP 
         </span>
-        {% if green or red %}
-        <span class="{% if green %}text-success{% elif red %}text-danger{% endif %} mt-1" style="font-size: large; font-weight: bold">
-            {{ message }}
+        <span class="text-success mt-1" style="font-size: large; font-weight: bold">
+            Sent To: {{ email }}
         </span>
-        {% endif %}
-        <form class="mt-2 d-flex flex-column align-items-center w-100" method="post">
+        <span class="mt-1" style="font-size: large; font-weight: bold">Enter OTP within 2 minutes!</span>
+        <span class="mt-1" style="font-size: large; font-weight: bold">Also Check Spam</span>
+        <form class="mt-1 d-flex flex-column align-items-center w-100" method="post">
             {% csrf_token %}
             <label class="w-100 d-flex align-items-center justify-content-center">
                 <input type="text" name="otp" id="otp" placeholder="6 digit OTP" minlength="6" maxlength="6" style="min-width: 69%" required>
             </label>
-            <!-- <label class="w-100 d-flex align-items-center justify-content-center mt-2">
-                <input type="password" name="password" id="password" placeholder="Password" minlength="8" maxlength="32" style=" min-width:69%" required>
-            </label>
-            <label class="mt-1">
-                <a href="404"><span style="font-size: 12px">Forgot Password</span></a>
-            </label> -->
-            <!-- <label>
-                <input type="checkbox" name="signed_in" value="signed_in">
-                <span style="font-size: 12px">Remember Me</span>
-            </label> -->
             <div class="d-flex flex-column align-items-center mt-2 w-100" >
                 <label style="max-width: 75%">
                     <button class="btn btn-success" style=" width: 125px; max-width: 100%;" type="submit">Validate
                     </button>
                 </label>
-                <!-- <label class="my-2" style="max-width: 75%">
-                    <a  href="/signup" style="text-decoration: none"><button class="btn btn-primary" style=" width: 125px; max-width: 100%;" type="button">Sign Up
-                    </button></a>
-
-                </label> -->
             </div>
         </form>
     </div>

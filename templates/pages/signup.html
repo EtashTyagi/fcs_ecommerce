@@ -86,9 +86,23 @@
 
             <div class="d-flex flex-column align-items-center mt-4 w-100" >
                 <label style="max-width: 75%">
-                    <button class="btn btn-success" style="height: 45px;width: 125px; max-width: 100%;" type="submit">Continue
+                    <button class="btn btn-success" style="height: 45px;width: 125px; max-width: 100%;" type="submit" data-toggle="modal" data-target="#modal_signup" id="modal_button_signup">
+                        Continue
                     </button>
-                </label>
+                    </label>
+                <div class="modal fade" id="modal_signup" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel_signup" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel_signup">Processing Request</h5>
+                              </div>
+                              <div class="modal-body">
+                                Please Wait!
+                              </div>
+                            </div>
+                        </div>
+                </div>
+
             </div>
         </form>
     </div>

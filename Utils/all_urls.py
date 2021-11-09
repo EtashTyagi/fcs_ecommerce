@@ -25,6 +25,6 @@ all_urls = {
     "email_verified": "/email_verified/",
     "verify_token": "/verify/<auth_token>",
     "verification_error": "/error",
-    "otp":"/otp/"
+    "otp": "/otp/"
 
 }
