@@ -1,16 +1,19 @@
 # IMPORTANT: PLEASE DO NOT USE FORMAT STRING IN RAW SQL QUERIES, IT WILL CAUSE SQL INJECTIONS
 # https://docs.djangoproject.com/en/3.2/topics/db/sql/
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
+from django.contrib.sessions.models import Session
 from django.core.exceptions import ValidationError
 from django.db import connection
+from django.utils import timezone
 
 from Main import settings
 from Sell.models import SellerRequest
 from Utils.upload_handler import FileValidator, upload_request_pdf_file, delete_request_pdf_file
 
 import uuid
-from .models import User_Profile
+from .models import Unverified_User
 from django.core.mail import send_mail
 
 common_passwords = ["password", "12345678"]  # store in sql maybe?
@@ -35,7 +38,7 @@ def create_user(request):
         created.save()
         add_phone_number(created.id, phone)
         auth_token = str(uuid.uuid4())
-        profile_obj = User_Profile.objects.create(user=created, auth_token=auth_token)
+        profile_obj = Unverified_User.objects.create(user=created, auth_token=auth_token)
         profile_obj.save()
         send_mail_after_registration(email, auth_token)
         return [True, created]
@@ -77,9 +80,20 @@ def authenticate_user(request):
     username = request.POST["username"]
     password = request.POST["password"]
 
-    user = authenticate(username=username, password=password)
-    login(request, user)
-    return [True, None]
+    try:
+        user_identified = User.objects.get(username=username)
+        if user_identified.check_password(password):
+            [s.delete() for s in Session.objects.all() if s.get_decoded().get('_auth_user_id') == user_identified.id]
+            user_identified.is_active = False
+        else:
+            return [False, "Wrong Credentials"]
+        user = authenticate(username=username, password=password)
+
+        login(request, user)
+        return [True, None]
+    except Exception as e:
+        print(e)
+        return [False, "Wrong Credentials"]
 
 
 def username_exists(username):

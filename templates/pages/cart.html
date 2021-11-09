@@ -64,7 +64,7 @@
                                                     <div class="modal-content">
                                                       <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel_{{ item.ID }}">Do you want to checkout?</h5>
-                                                        <button type="button" class="close btn btn-light"  data-dismiss="modal_{{ item.ID }}" aria-label="Close">
+                                                        <button type="button" class="close btn btn-light"  data-dismiss="modal" aria-label="Close">
                                                           <span aria-hidden="true">&times;</span>
                                                         </button>
                                                       </div>
@@ -74,7 +74,7 @@
                                                           <b>Price: </b> {{ item.price }}
                                                       </div>
                                                       <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal_{{ item.ID }}">Cancel</button>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                                                           <form action="{% url 'create-checkout-session' item.ID %}" method="post">
                                                               {% csrf_token %}
                                                             <button type="submit" class="btn btn-primary">Continue</button>

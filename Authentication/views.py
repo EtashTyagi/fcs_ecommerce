@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from Authentication.auth_handler import *
 from Utils.all_urls import all_urls
-from .models import User_Profile
+from .models import Unverified_User
 from django.contrib import messages
 
 """ Define All HTML Views To Render Here in all_views list with appropriate name"""
@@ -39,7 +39,7 @@ def login(request):
         response = authenticate_user(request)
         if not response[0]:
             args["red"] = True
-            args["message"] = "Wrong Credentials"
+            args["message"] = response[1]
             return render(request, 'pages/login.html', args)
         else:
             redirect_to = all_urls["home"]
@@ -87,7 +87,7 @@ def email_verified(request):
 
 def verify(request, auth_token):
     try:
-        profile_obj = User_Profile.objects.filter(auth_token=auth_token).first()
+        profile_obj = Unverified_User.objects.filter(auth_token=auth_token).first()
 
         if profile_obj:
             profile_obj.delete()
