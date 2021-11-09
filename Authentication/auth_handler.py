@@ -47,7 +47,7 @@ def create_user(request):
 
 def send_mail_after_registration(email , token):
     subject = 'Your accounts need to be verified'
-    message = f'Hey,\n paste the link in your browser or click on it to verify your account http://127.0.0.1:8000/verify/{token}'
+    message = f'Hey,\npaste the link in your browser or click on it to verify your account http://127.0.0.1:8000/verify/{token} \nthis is a system generated mail. Do not reply'
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [email]
     send_mail(subject, message , email_from ,recipient_list )
@@ -77,8 +77,11 @@ def authenticate_user(request):
     password = request.POST["password"]
 
     user = authenticate(username=username, password=password)
+    user_obj = User.objects.get(username=username)
+    profile_obj = User_Profile.objects.get(user = user_obj)
+    email_verified = profile_obj.is_verified
 
-    if user is None:
+    if (user is None) or (not email_verified) :
         return [False, "Invalid Credentials"]
     else:
         login(request, user)
