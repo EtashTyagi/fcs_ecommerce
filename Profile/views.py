@@ -31,23 +31,24 @@ def profile(request):
         usr_id = request.user.id
         if "id" in request.GET:
             usr_id = request.GET["id"][-1] if len(request.GET["id"]) > 0 and request.GET["id"][-1] == '/' else \
-            request.GET["id"]
+                request.GET["id"]
 
         if request.user.is_authenticated:
-            user = User.objects.get(id=usr_id)
-            if user:
-                args = {"group": None, "id": user.id, "email": user.email, "owner": user.id == request.user.id,
-                        "username": user.username}
-                if user.is_superuser:
-                    args["group"] = "admin"
-                elif is_seller(user):
-                    args["group"] = "seller"
-                elif is_buyer(user):
-                    args["group"] = "buyer"
-                else:
-                    args["group"] = ""
-                return render(request, 'pages/main_profile.html', args)
-            else:
+            try:
+                user = User.objects.get(id=usr_id)
+                if user:
+                    args = {"group": None, "id": user.id, "email": user.email, "owner": user.id == request.user.id,
+                            "username": user.username, "first_name": user.first_name, "last_name": user.last_name}
+                    if user.is_superuser:
+                        args["group"] = "admin"
+                    elif is_seller(user):
+                        args["group"] = "seller"
+                    elif is_buyer(user):
+                        args["group"] = "buyer"
+                    else:
+                        args["group"] = ""
+                    return render(request, 'pages/main_profile.html', args)
+            except Exception as e:
                 return HttpResponse("<h1>Error</h1><p>User Not Found!</p>")
         else:
             request.session['login_to_continue_to'] = all_urls["profile"]
@@ -111,11 +112,13 @@ def admin_response_to_seller_request_GUI(request):
 
 
 def purchases(request):
-    if request.user.is_authenticated and (is_buyer(request.user) or is_seller(request.user) or request.user.is_superuser):
+    if request.user.is_authenticated and (
+            is_buyer(request.user) or is_seller(request.user) or request.user.is_superuser):
         args = {"purchases": fetch_buyer_purchases(request.user)}
         return render(request, "pages/buyer_purchases.html", args)
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+
 
 all_views = {
     "profile": profile,

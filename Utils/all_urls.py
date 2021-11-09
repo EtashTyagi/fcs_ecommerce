@@ -21,9 +21,9 @@ all_urls = {
     "search": "/search/",
     "admin_response_to_new_item_request": "/item_handler/",
     "admin_response_to_seller_request": "/seller_handler/",
-    "email_token":"/token/",
-    "email_verified":"/email_verified/",
-    "verify_token":"/verify/<auth_token>",
-    "verification_error":"/error",
+    "email_token": "/token/",
+    "email_verified": "/email_verified/",
+    "verify_token": "/verify/<auth_token>",
+    "verification_error": "/error",
 
 }

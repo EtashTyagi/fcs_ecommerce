@@ -12,6 +12,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from Authentication.auth_handler import is_seller, is_buyer
 from Cart.cart_handler import insert_new_transaction, succeed_transaction, fail_transaction
+from Store.models import Product
+from Utils.all_urls import all_urls
 from Utils.item_handler import reserve_item, fetchFullItem
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -21,7 +23,11 @@ class CreateCheckoutSessionView(View):
     def post(self, request, *args, **kwargs):
         item = fetchFullItem(self.kwargs["pk"])
         YOUR_DOMAIN = "http://127.0.0.1:80"  # change in production
-        if reserve_item(item["ID"]):
+        if not request.user.is_authenticated:
+            return redirect(all_urls["login"])
+        elif not (is_buyer(request.user) or is_seller(request.user)):
+            return HttpResponse("<h1>Error</h1><p>Account Not Verified</p>")
+        elif reserve_item(item["ID"]):
             checkout_session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
                 line_items=[
@@ -33,7 +39,8 @@ class CreateCheckoutSessionView(View):
                 mode='payment',
                 success_url=YOUR_DOMAIN + '/success/',
                 cancel_url=YOUR_DOMAIN + '/cancel/',
-                expires_at=(int(time.time()+3602))
+                expires_at=(int(time.time() + 3602)),
+                shipping_address_collection={"allowed_countries":["IN"]}
             )
             insert_new_transaction(item["seller_id"],
                                    item["ID"], request.user.id,
@@ -84,27 +91,26 @@ class CancelView(TemplateView):
             return HttpResponse("Invalid Request")
 
 
-
-
-
 class StripeIntentView(View):
     def post(self, request, *args, **kwargs):
         try:
             req_json = json.loads(request.body)
             customer = stripe.Customer.create(email=req_json['email'])
-            price = get_item_by_priceID(self.kwargs["pk"])
+            product = Product.objects.get(stripe_price_id=self.kwargs["pk"])
             intent = stripe.PaymentIntent.create(
-                amount=price.price,
-                currency='usd',
+                amount=product.price,
+                currency='inr',
                 customer=customer['id'],
                 metadata={
-                    "price_id": price.id
+                    "price_id": product.stripe_price_id
                 }
             )
+            print("Something")
             return JsonResponse({
                 'clientSecret': intent['client_secret']
             })
         except Exception as e:
+            print("Failed")
             return JsonResponse({'error': str(e)})
 
 
@@ -112,8 +118,9 @@ class CustomPaymentView(TemplateView):
     template_name = "pages/custom_payment.html"
 
     def get_context_data(self, **kwargs):
-        product = stripe_Product.objects.get(name="MSI GF75 Thin")
-        prices = Price.objects.filter(product=product)
+        print("CUSTOM PAYMENT")
+        product = Product.objects.get(stripe_prod_id=1)
+        prices = Product.objects.get(stripe_price_id=1)
         context = super(CustomPaymentView, self).get_context_data(**kwargs)
         context.update({
             "product": product,

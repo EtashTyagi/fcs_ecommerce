@@ -35,21 +35,23 @@ def create_user(request):
         created.save()
         add_phone_number(created.id, phone)
         auth_token = str(uuid.uuid4())
-        profile_obj = User_Profile.objects.create(user = created , auth_token = auth_token)
+        profile_obj = User_Profile.objects.create(user=created, auth_token=auth_token)
         profile_obj.save()
-        send_mail_after_registration(email , auth_token)
+        send_mail_after_registration(email, auth_token)
         return [True, created]
+
 
 # -----------------------------------------------------------------------------------------------------------
 
-# change the below link at time of production
+# TODO: change the below link at time of production
 
-def send_mail_after_registration(email , token):
-    subject = 'Your accounts need to be verified'
-    message = f'Hey,\npaste the link in your browser or click on it to verify your account http://127.0.0.1:8000/verify/{token} \nthis is a system generated mail. Do not reply'
+def send_mail_after_registration(email, token):
+    subject = 'Please Verify Your FCS Account'
+    message = f'Hey,\npaste the link in your browser or click on it to verify your account http://127.0.0.1:80/verify/{token} \nthis is a system generated mail. Do not reply'
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [email]
-    send_mail(subject, message , email_from ,recipient_list )
+    send_mail(subject, message, email_from, recipient_list)
+
 
 def is_seller(user):
     return user.groups.filter(name='seller').exists()
@@ -76,15 +78,8 @@ def authenticate_user(request):
     password = request.POST["password"]
 
     user = authenticate(username=username, password=password)
-    user_obj = User.objects.get(username=username)
-    profile_obj = User_Profile.objects.get(user = user_obj)
-    email_verified = profile_obj.is_verified
-
-    if (user is None) or (not email_verified) :
-        return [False, "Invalid Credentials"]
-    else:
-        login(request, user)
-        return [True, None]
+    login(request, user)
+    return [True, None]
 
 
 def username_exists(username):
@@ -129,7 +124,13 @@ def validate_name(name):
 def validate_email(email):
     name_domain = email.split("@")
     match = len(name_domain) == 2 and '.' in name_domain[1]
-    return [match, None if match else "Invalid Email-ID"]
+    if not match:
+        return [False, "Invalid Email-ID"]
+    try:
+        User.objects.get(email=email)
+        return [False, "Email Already Registered"]
+    except Exception as e:
+        return [True, None]
 
 
 def validate_password(password, password_conf):
@@ -167,7 +168,8 @@ def make_seller_request(request):
         print(request.FILES)
         processing = False
         for req in SellerRequest.objects.raw(
-                'SELECT id FROM sell_sellerrequest WHERE buyer_id=%s AND LOWER(message)=%s', [request.user.id, "processing"]):
+                'SELECT id FROM sell_sellerrequest WHERE buyer_id=%s AND LOWER(message)=%s',
+                [request.user.id, "processing"]):
             processing = True
 
         if processing:

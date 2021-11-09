@@ -29,7 +29,7 @@ def login(request):
     elif request.method == "GET":
         if 'redirect_from_signup' in request.session.keys():
             args["green"] = True
-            args["message"] = "Sign-up Successful"
+            args["message"] = "Please Verify Email"
             request.session.pop('redirect_from_signup')
         if 'login_to_continue_to' in request.session.keys():
             args["green"] = True
@@ -50,7 +50,6 @@ def login(request):
         return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
 
 
-# TODO: VERIFY EMAIL?
 def signup(request):
     request.session.pop('login_to_continue_to', None)
     args = {"failed": False, "message": ""}
@@ -66,9 +65,8 @@ def signup(request):
             return render(request, 'pages/signup.html', args)
         else:
             args["user"] = response[1]
-        request.session['redirect_from_signup'] = True
-        # return redirect(all_urls["login"])
-        return redirect(all_urls["email_token"])
+            request.session['redirect_from_signup'] = True
+            return redirect(all_urls["email_token"])
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
 
@@ -78,40 +76,42 @@ def logout(request):
     logout_user(request)
     return redirect(all_urls["home"])
 
+
 def email_token(request):
     return render(request, 'pages/token_send.html')
 
-def email_verified(request):
-    return render(request , 'pages/email_verified.html')
 
-def verify(request , auth_token):
+def email_verified(request):
+    return render(request, 'pages/email_verified.html')
+
+
+def verify(request, auth_token):
     try:
-        profile_obj = User_Profile.objects.filter(auth_token = auth_token).first()
-    
+        profile_obj = User_Profile.objects.filter(auth_token=auth_token).first()
 
         if profile_obj:
+            profile_obj.delete()
             if is_buyer(profile_obj.user) or is_seller(profile_obj.user):
-                # messages.success(request, 'Your account is already verified.')
                 return redirect(all_urls["login"])
             make_buyer(profile_obj.user)
             profile_obj.save()
-            # messages.success(request, 'Your account has been verified.')
             return redirect(all_urls["login"])
         else:
             return redirect('/error')
     except Exception as e:
-        print(e)
-        return redirect('/')
+        return redirect(all_urls["login"])
+
 
 def error_page(request):
-    return  render(request , 'pages/error_page.html')
+    return render(request, 'pages/error_page.html')
+
 
 all_views = {
     "login": login,
     "signup": signup,
     "logout": logout,
-    "email_token":email_token,
-    "email_verified":email_verified,
-    "verify_token":verify,
-    "verification_error":error_page
+    "email_token": email_token,
+    "email_verified": email_verified,
+    "verify_token": verify,
+    "verification_error": error_page
 }
