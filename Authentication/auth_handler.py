@@ -85,12 +85,10 @@ def authenticate_user(request):
         if user_identified.check_password(password):
             [s.delete() for s in Session.objects.all() if s.get_decoded().get('_auth_user_id') == user_identified.id]
             user_identified.is_active = False
+            return [True, None, user_identified.id]
         else:
             return [False, "Wrong Credentials"]
-        user = authenticate(username=username, password=password)
-
-        login(request, user)
-        return [True, None]
+        
     except Exception as e:
         print(e)
         return [False, "Wrong Credentials"]

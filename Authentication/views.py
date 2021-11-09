@@ -3,7 +3,19 @@ from django.shortcuts import render, redirect
 from Authentication.auth_handler import *
 from Utils.all_urls import all_urls
 from .models import Unverified_User
-from django.contrib import messages
+from django.contrib import messages, auth
+
+from datetime import datetime
+import pyotp
+import string    
+import random
+import base64
+from django.core.mail import send_mail
+
+# Time after which OTP will expire
+EXPIRY_TIME = 120 # seconds
+random_string = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 10))
+
 
 """ Define All HTML Views To Render Here in all_views list with appropriate name"""
 """ View Format (Follow Strictly !!!!):
@@ -42,9 +54,27 @@ def login(request):
             args["message"] = response[1]
             return render(request, 'pages/login.html', args)
         else:
-            redirect_to = all_urls["home"]
-            if 'login_to_continue_to' in request.session.keys():
-                redirect_to = request.session['login_to_continue_to']
+            userid = response[2]
+            request.session['otp_user_id']=userid
+            
+            user = User.objects.get(id = userid)
+            email = user.email  
+            keygen = generate_key()
+            key = base64.b32encode(keygen.encode())
+            OTP = pyotp.TOTP(key,interval = EXPIRY_TIME) # do not take this out of this scope
+            subject = 'OTP validation'
+            message = 'Hey,\nBelow is the 6 digit otp:\n'+  str(OTP.now())+ '\n\nthis is a system generated mail. Do not reply'
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [email]
+            send_mail(subject, message , email_from ,recipient_list )
+            request.session['otp_key'] = keygen
+            
+
+            # redirect_to = all_urls["home"]
+            redirect_to = "/otp/"
+            # redirect_to = all_urls["home"]
+            # if 'login_to_continue_to' in request.session.keys():
+            #     redirect_to = request.session['login_to_continue_to']
             return redirect(redirect_to)
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
@@ -105,6 +135,39 @@ def verify(request, auth_token):
 def error_page(request):
     return render(request, 'pages/error_page.html')
 
+def generate_key():
+    return str(datetime.date(datetime.now())) +  random_string
+    
+
+def otp(request):
+    
+    if request.method == "GET":
+        if 'otp_user_id' in request.session.keys():
+            return render(request,"pages/otp.html")
+        else:
+            return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+
+    elif request.method == "POST":
+        keygen = request.session['otp_key']
+        key = base64.b32encode(keygen.encode())
+        request.session.pop('otp_key')
+        OTP = pyotp.TOTP(key,interval = EXPIRY_TIME)  # TOTP Model 
+        if OTP.verify(request.POST["otp"]):
+            user = User.objects.get(id = request.session['otp_user_id'])
+            auth.login(request, user)
+            request.session.pop('otp_user_id')
+            # make user authenticated here
+            if 'login_to_continue_to' in request.session:
+                return redirect(request.session['login_to_continue_to'])
+            else:
+                return redirect(all_urls['home'])
+        else:
+            # show a response that otp is expired
+            # return Response("OTP is wrong/expired", status=400)
+            return HttpResponse(f"<h1>Error</h1><p> Otp was wrong or expired </p><p><a href='{all_urls['login']}'>Try again</a></p>")
+    else:
+        return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+
 
 all_views = {
     "login": login,
@@ -113,5 +176,6 @@ all_views = {
     "email_token": email_token,
     "email_verified": email_verified,
     "verify_token": verify,
-    "verification_error": error_page
+    "verification_error": error_page,
+    "otp":otp,
 }
