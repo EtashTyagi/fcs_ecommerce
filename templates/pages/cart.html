@@ -77,11 +77,15 @@
                                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                                                           <form action="{% url 'create-checkout-session' item.ID %}" method="post">
                                                               {% csrf_token %}
-                                                            <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#modal_otp{{ item.ID }}" data-dismiss="modal_2">
+                                                            <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#modal_otp{{ item.ID }}">
                                                                 Continue
                                                             </button>
                                                           </form>
-                                                          <div class="modal fade" id="modal_otp{{ item.ID }}" tabindex="-1" aria-hidden="true">
+                                                      </div>
+                                                    </div>
+                                                </div>
+                                        </div>
+                                    <div class="modal fade" id="modal_otp{{ item.ID }}" tabindex="-1" aria-hidden="true" data-backdrop="static" data-keyboard="false">
                                                               <div class="modal-dialog">
                                                                   <div class="modal-content">
                                                                       <div class="modal-header">
@@ -93,10 +97,11 @@
                                                                   </div>
                                                               </div>
                                                           </div>
-                                                      </div>
-                                                    </div>
-                                                </div>
-                                        </div>
+                                    <script>
+                                                              $('#modal_otp{{ item.ID }}').on('shown.bs.modal', function () {
+                                                              $('#modal_{{ item.ID }}').hide()
+                                                            })
+                                                          </script>
                                     </div>
                                 </div>
                             </div>

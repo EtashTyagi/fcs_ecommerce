@@ -65,14 +65,14 @@
             </label>
             <script>let fp=""</script>
             <label class="w-100 d-flex align-items-center justify-content-center mt-3"  style="max-width: 410px">
-                <input type="password" placeholder="Password" name="password" id="password" style="min-width: 100%;max-width: 410px"
+                <input class="use-keyboard-input" type="password" placeholder="Password" name="password" id="password" style="min-width: 100%;max-width: 410px"
                 minlength="8"
                 maxlength="32" onchange="fp=this.value" required>
             </label>
             <label class="w-100 d-flex align-items-center justify-content-center mt-3"  style="max-width: 410px">
                 <input type="password" placeholder="Confirm Password" name="conf_password" id="conf_password" style="min-width: 100%;max-width: 410px"
                 minlength="8"
-                maxlength="32" oninput="if (fp !== this.value) {this.setCustomValidity('Passwords do not match')} else {this.setCustomValidity('')}" required>
+                maxlength="32" class="use-keyboard-input" oninput="if (fp !== this.value) {this.setCustomValidity('Passwords do not match')} else {this.setCustomValidity('')}" required>
             </label>
             <style>
                     .keyboard {
@@ -345,7 +345,7 @@ window.addEventListener("DOMContentLoaded", function () {
                         Continue
                     </button>
                     </label>
-                <div class="modal fade" id="modal_signup" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel_signup" aria-hidden="true">
+                <div class="modal fade" id="modal_signup" data-backdrop="static" tabindex="-1" role="dialog" data-keyboard="false" aria-labelledby="exampleModalLabel_signup" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                               <div class="modal-header">
