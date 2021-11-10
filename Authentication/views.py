@@ -1,5 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse
+
 from Authentication.auth_handler import *
 from Utils.all_urls import all_urls
 from .models import Unverified_User
@@ -14,7 +16,6 @@ from django.core.mail import send_mail
 
 # Time after which OTP will expire
 EXPIRY_TIME = 120  # seconds
-random_string = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
 
 """ Define All HTML Views To Render Here in all_views list with appropriate name"""
 """ View Format (Follow Strictly !!!!):
@@ -58,9 +59,9 @@ def login(request):
 
             user = User.objects.get(id=userid)
 
-            if is_buyer(user) or is_seller(user) or user.is_superuser:
+            if is_buyer(user) or is_seller(user) or is_admin(user):
                 email = user.email
-                keygen = generate_key()
+                keygen = generate_key(''.join(random.choices(string.ascii_uppercase + string.digits, k=10))) + user.email
                 key = base64.b32encode(keygen.encode())
                 OTP = pyotp.TOTP(key, interval=EXPIRY_TIME)  # do not take this out of this scope
                 subject = 'OTP validation'
@@ -74,8 +75,9 @@ def login(request):
                 redirect_to = "/otp/"
                 return redirect(redirect_to)
             else:
-                auth.login(request, user)
-                return redirect(all_urls["profile"])
+                args["red"] = True
+                args["message"] = "Email not verified"
+                return render(request, 'pages/login.html', args)
 
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
@@ -137,35 +139,64 @@ def error_page(request):
     return render(request, 'pages/error_page.html')
 
 
-def generate_key():
+def generate_key(random_string):
     return str(datetime.date(datetime.now())) + random_string
 
 
 def otp(request):
     if request.user.is_authenticated:
         return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
-    if request.method == "GET":
-        if 'otp_user_id' in request.session.keys():
-            user = User.objects.get(id=request.session['otp_user_id'])
-            args = {"email": user.email}
-            return render(request, "pages/otp.html", args)
-        else:
-            return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
 
+    if 'otp_user_id' not in request.session.keys():
+        return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+
+    if request.method == "GET":
+        user = User.objects.get(id=request.session['otp_user_id'])
+        args = {"email": user.email}
+        return render(request, "pages/otp.html", args)
     elif request.method == "POST":
         keygen = request.session['otp_key']
         key = base64.b32encode(keygen.encode())
         request.session.pop('otp_key')
         OTP = pyotp.TOTP(key, interval=EXPIRY_TIME)  # TOTP Model
+        user = User.objects.get(id=request.session['otp_user_id'])
+        request.session.pop('otp_user_id')
         if OTP.verify(request.POST["otp"]):
-            user = User.objects.get(id=request.session['otp_user_id'])
             auth.login(request, user)
-            request.session.pop('otp_user_id')
-            # make user authenticated here
             if 'login_to_continue_to' in request.session:
                 return redirect(request.session['login_to_continue_to'])
             else:
                 return redirect(all_urls['home'])
+        else:
+            # show a response that otp is expired
+            # return Response("OTP is wrong/expired", status=400)
+            return HttpResponse(
+                f"<h1>Error</h1><p> Otp was wrong or expired </p><p><a href='{all_urls['login']}'>Try again</a></p>")
+    else:
+        return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+
+
+def otp_payment(request):
+    if not request.user.is_authenticated:
+        return HttpResponse("<h1>Error</h1><p>Permission Denied</p>")
+
+    if 'otp_user_id_payment' not in request.session.keys():
+        return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+
+    if request.method == "GET":
+        user = User.objects.get(id=request.session['otp_user_id_payment'])
+        args = {"email": user.email}
+        return render(request, "pages/otp.html", args)
+    elif request.method == "POST":
+        keygen = request.session['otp_key_payment']
+        key = base64.b32encode(keygen.encode())
+        request.session.pop('otp_key_payment')
+        OTP = pyotp.TOTP(key, interval=EXPIRY_TIME)
+        request.session.pop('otp_user_id_payment')
+
+        if OTP.verify(request.POST["otp"]):
+            request.session["otp_payment_success"] = True
+            return redirect(reverse("create-checkout-session", args=[request.session["payment_item_id"]]))
         else:
             # show a response that otp is expired
             # return Response("OTP is wrong/expired", status=400)
@@ -184,4 +215,5 @@ all_views = {
     "verify_token": verify,
     "verification_error": error_page,
     "otp": otp,
+    "otp_payment": otp_payment,
 }

@@ -38,8 +38,9 @@ def profile(request):
                 user = User.objects.get(id=usr_id)
                 if user:
                     args = {"group": None, "id": user.id, "email": user.email, "owner": user.id == request.user.id,
-                            "username": user.username, "first_name": user.first_name, "last_name": user.last_name}
-                    if user.is_superuser:
+                            "username": user.username, "first_name": user.first_name, "last_name": user.last_name,
+                            "phone_number": get_phone_number(user)}
+                    if is_admin(user):
                         args["group"] = "admin"
                     elif is_seller(user):
                         args["group"] = "seller"
@@ -53,14 +54,20 @@ def profile(request):
         else:
             request.session['login_to_continue_to'] = all_urls["profile"]
             return redirect(all_urls["login"])
+    elif request.method == "POST" and "modify_profile" in request.POST:
+        result = update_phone_number(request.user, request.POST["phone"])
+        if result[0]:
+            return redirect(all_urls["profile"])
+        else:
+            return HttpResponse(f"<h1>Error</h1><p>Invalid Mobile Number!</p><p><a href='{redirect(all_urls['profile'])}'>go back</a></p>")
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
 
 
 def admin_response_to_new_item_request_GUI(request):
-    if request.user.is_authenticated and request.user.is_superuser:
+    if request.user.is_authenticated and is_admin(request.user):
         if request.method == "GET":
-            req_items = fetch_new_item_requests()
+            req_items = fetch_new_item_requests_using(request.user)
             args = {"requests": req_items, "keys": list(req_items[0].keys()) if len(req_items) != 0 else []}
             return render(request, 'pages/admin_response_to_new_item_request.html', args)
         elif request.method == "POST":
@@ -74,7 +81,7 @@ def admin_response_to_new_item_request_GUI(request):
                             request.POST["message"] if "message" in request.POST else "")
             else:
                 return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
-            req_items = fetch_new_item_requests()
+            req_items = fetch_new_item_requests_using(request.user)
             args = {"requests": req_items, "keys": list(req_items[0].keys()) if len(req_items) != 0 else []}
             return render(request, 'pages/admin_response_to_new_item_request.html', args)
         else:
@@ -84,9 +91,9 @@ def admin_response_to_new_item_request_GUI(request):
 
 
 def admin_response_to_seller_request_GUI(request):
-    if request.user.is_authenticated and request.user.is_superuser:
+    if request.user.is_authenticated and is_admin(request.user):
         if request.method == "GET":
-            req_items = get_all_seller_requests()
+            req_items = get_all_seller_requests_using(request.user)
             args = {"requests": req_items, "keys": list(req_items[0].keys()) if len(req_items) != 0 else []}
             return render(request, 'pages/admin_response_to_seller_request.html', args)
         elif request.method == "POST":
@@ -102,7 +109,7 @@ def admin_response_to_seller_request_GUI(request):
                                       request.POST["message"] if "message" in request.POST else "")
             else:
                 return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
-            req_items = get_all_seller_requests()
+            req_items = get_all_seller_requests_using(request.user)
             args = {"requests": req_items, "keys": list(req_items[0].keys()) if len(req_items) != 0 else []}
             return render(request, 'pages/admin_response_to_seller_request.html', args)
         else:
@@ -113,7 +120,7 @@ def admin_response_to_seller_request_GUI(request):
 
 def purchases(request):
     if request.user.is_authenticated and (
-            is_buyer(request.user) or is_seller(request.user) or request.user.is_superuser):
+            is_buyer(request.user) or is_seller(request.user) or is_admin(request.user)):
         args = {"purchases": fetch_buyer_purchases(request.user)}
         return render(request, "pages/buyer_purchases.html", args)
     else:

@@ -7,14 +7,17 @@ Function views
     1. Add an import:  from my_app import views
     2. Write a renderer in views and include it in all_views dictionary with relevant info
 """
+from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 
+import Authentication.views
 from Main.views import all_views
 from Utils.all_urls import all_urls
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    url(r'^admin/login/', Authentication.views.login),
+    url(r'admin/', admin.site.urls),
     path('', include('Store.urls')),
     path('', include('Authentication.urls')),
     path('', include('Cart.urls')),

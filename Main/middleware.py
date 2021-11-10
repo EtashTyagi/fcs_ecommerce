@@ -1,8 +1,6 @@
 # Session model stores the session data
 from django.contrib.sessions.models import Session
 
-from Main.models import LoggedInUser
-
 
 class OneSessionPerUserMiddleware:
     # Called only once when the web server starts
@@ -13,7 +11,7 @@ class OneSessionPerUserMiddleware:
         # Code to be executed for each request before
         # the view (and later middleware) are called.
         if request.user.is_authenticated:
-            stored_session_key = LoggedInUser.objects.get(user=request.user).session_key
+            stored_session_key = request.user.logged_in_user.session_key
 
             # if there is a stored_session_key  in our database and it is
             # different from the current session, delete the stored_session_key
@@ -21,9 +19,8 @@ class OneSessionPerUserMiddleware:
             if stored_session_key and stored_session_key != request.session.session_key:
                 Session.objects.get(session_key=stored_session_key).delete()
 
-            liu = LoggedInUser.objects.get(user=request.user)
-            liu.session_key = request.session.session_key
-            liu.save()
+            request.user.logged_in_user.session_key = request.session.session_key
+            request.user.logged_in_user.save()
 
         response = self.get_response(request)
 

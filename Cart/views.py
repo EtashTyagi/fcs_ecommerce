@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
-from Authentication.auth_handler import is_seller, is_buyer
+from Authentication.auth_handler import is_seller, is_buyer, is_admin
 from Cart.cart_handler import fetchCart, is_in_cart, remove_from_cart
 from Utils.all_urls import all_urls
 
@@ -24,7 +24,7 @@ def cart(request):
     if not request.user.is_authenticated:
         request.session['login_to_continue_to'] = all_urls["cart"]
         return redirect(all_urls["login"])
-    elif (not is_seller(request.user)) and (not is_buyer(request.user)):
+    elif (not is_seller(request.user)) and (not is_buyer(request.user)) and (not is_admin(request.user)):
         return HttpResponse("<h1>Error</h1><p>Account Not Verified</p>")
     elif request.method == "GET":
         args = {"items": fetchCart(request.user), "tot_price": 0}

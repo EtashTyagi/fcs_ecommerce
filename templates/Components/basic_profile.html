@@ -18,19 +18,25 @@
                 <hr class="mt-0">
                 <div>
                     <div class="col-xs-6">
-                        <h4>User ID</h4>
+                        <h4 style="display: inline" class="me-1">User ID:</h4>
                         <span>{{ id }}</span>
                     </div>
                 </div>
                 <div>
-                    <div class="col-xs-6">
-                        <h4>Email-ID</h4>
+                    <div class="col-xs-6 mt-3">
+                        <h4 style="display: inline" class="me-1">Email-ID:</h4>
                         <span>{{ email }}</span>
                     </div>
                 </div>
+                {% if owner %}
+                    <div class="col-xs-6 mt-3">
+                        <h4 style="display: inline" class="me-1">Phone Number:</h4>
+                        <span>{{ phone_number }}</span>
+                    </div>
+                {% endif %}
                 <div>
-                    <div class="col-xs-6">
-                        <h4>Role</h4>
+                    <div class="col-xs-6 mt-3">
+                        <h4 style="display: inline" class="me-1">Role:</h4>
                         <span>{{ group }}</span>
                     </div>
                 </div>
@@ -39,7 +45,52 @@
                 <div class="w-100 d-flex flex-column">
                     {% if group == "buyer" or group == "seller" or group == "admin" %}
                     <div class="w-100">
-                        <button class="btn btn-primary w-100">Modify Profile</button>
+                        <button class="btn btn-primary w-100" data-toggle="modal" data-target="#modal_2" type="button" id="modal_1">Modify Profile</button>
+                                        <div class="modal fade" id="modal_2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel_1" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                      <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLabel_1">Change Details</h5>
+                                                        <button type="button" class="close btn btn-light"  data-dismiss="modal" aria-label="Close">
+                                                          <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                      </div>
+                                                        <form class="form w-100" method="post">
+                                                            {% csrf_token %}
+                                                      <div class="modal-body d-flex flex-column">
+
+                                                            <label class="mt-1">
+                                                                <style>
+                                                                    input::-webkit-outer-spin-button,
+                                                                    input::-webkit-inner-spin-button {
+                                                                        -webkit-appearance: none;
+                                                                        margin: 0;
+                                                                    }
+
+                                                                    input[type=number] {
+                                                                        -moz-appearance: textfield;
+                                                                    }
+                                                                </style>
+                                                                <b>Phone number:</b>
+                                                                <input  class="ms-1"
+                                                                    oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);
+                                                                            if (this.value.length < this.maxLength) this.setCustomValidity('Phone must be 10 digit long');
+                                                                            if (this.value.length === this.maxLength) this.setCustomValidity('')"
+                                                                    type = "number"
+                                                                    maxlength = "10"
+                                                                    placeholder="Mobile" name="phone" id="phone" value="{{ phone_number }}" required>
+                                                            </label>
+
+                                                      </div>
+                                                      <div class="modal-footer">
+                                                          <button type="submit" name="modify_profile" class="btn btn-primary">Submit</button>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+
+                                                      </div>
+                                                            </form>
+                                                    </div>
+                                                </div>
+                                        </div>
                     </div>
                     <div class="mt-1 w-100">
                         <a class="btn btn-secondary w-100" href="/purchases/">Purchases</a>

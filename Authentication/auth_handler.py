@@ -1,12 +1,11 @@
 # IMPORTANT: PLEASE DO NOT USE FORMAT STRING IN RAW SQL QUERIES, IT WILL CAUSE SQL INJECTIONS
 # https://docs.djangoproject.com/en/3.2/topics/db/sql/
 
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User, Group
+from django.contrib.auth import logout
+from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.core.exceptions import ValidationError
 from django.db import connection
-from django.utils import timezone
 
 from Main import settings
 from Sell.models import SellerRequest
@@ -15,6 +14,8 @@ from Utils.upload_handler import FileValidator, upload_request_pdf_file, delete_
 import uuid
 from .models import Unverified_User
 from django.core.mail import send_mail
+
+
 
 common_passwords = ["password", "12345678"]  # store in sql maybe?
 
@@ -64,15 +65,29 @@ def is_buyer(user):
     return user.groups.filter(name='buyer').exists()
 
 
+def is_admin(user):
+    if user.is_superuser or user.groups.filter(name='admin').exists():
+        return True
+    return False
+
+
 def make_seller(user):
-    group = Group.objects.get(name="buyer")
-    user.groups.remove(group)
-    group = Group.objects.get(name="seller")
+    try:
+        group = User.objects.get(name="buyer")
+        user.groups.remove(group)
+    except Exception as ignore:
+        print(ignore)
+    group = User.objects.get(name="seller")
     user.groups.add(group)
 
 
 def make_buyer(user):
-    group = Group.objects.get(name="buyer")
+    try:
+        group = User.objects.get(name="seller")
+        user.groups.remove(group)
+    except Exception as ignore:
+        print(ignore)
+    group = User.objects.get(name="buyer")
     user.groups.add(group)
 
 
@@ -83,7 +98,7 @@ def authenticate_user(request):
     try:
         user_identified = User.objects.get(username=username)
         if user_identified.check_password(password):
-            [s.delete() for s in Session.objects.all() if s.get_decoded().get('_auth_user_id') == user_identified.id]
+            # [s.delete() for s in Session.objects.all() if s.get('_auth_user_id') == user_identified.id]
             user_identified.is_active = False
             return [True, None, user_identified.id]
         else:
@@ -167,6 +182,22 @@ def add_phone_number(user_id, phone_number):
         cursor.execute("INSERT INTO phone_numbers VALUES (%s, %s)", [user_id, phone_number])
 
 
+def get_phone_number(user):
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM phone_numbers WHERE user_id=%s", [user.id])
+        result_set = cursor.fetchall()
+        for row in result_set:
+            return row[1]
+
+
+def update_phone_number(user, new_phone_number):
+    validation = validate_phone(new_phone_number)
+    if validation[0]:
+        with connection.cursor() as cursor:
+            cursor.execute("UPDATE phone_numbers SET phone_number=%s WHERE user_id=%s", [new_phone_number, user.id])
+    return validation
+
+
 def logout_user(request):
     if request.user.is_authenticated:
         logout(request)
@@ -176,8 +207,7 @@ def logout_user(request):
 
 
 def make_seller_request(request):
-    if request.method == "POST" and is_buyer(request.user):
-        print(request.FILES)
+    if request.method == "POST" and not is_seller(request.user):
         processing = False
         for req in SellerRequest.objects.raw(
                 'SELECT id FROM sell_sellerrequest WHERE buyer_id=%s AND LOWER(message)=%s',
@@ -216,15 +246,24 @@ def get_seller_request_status(user):
     return "You Are Not A Verified Seller."
 
 
-def get_all_seller_requests():
+def get_all_seller_requests_using(user):
     pending = []
-    for req in SellerRequest.objects.raw(
-            'SELECT id, buyer_id, message FROM sell_sellerrequest WHERE LOWER(message)=%s', ["processing"]):
-        pending.append({
-            "req_id": str(req.id),
-            "buyer_id": str(req.buyer_id),
-            "message": req.message
-        })
+    if user.is_superuser:
+        for req in SellerRequest.objects.raw(
+                'SELECT id, buyer_id, message FROM sell_sellerrequest WHERE LOWER(message)=%s', ["processing"]):
+            pending.append({
+                "req_id": str(req.id),
+                "buyer_id": str(req.buyer_id),
+                "message": req.message
+            })
+    elif is_admin(user):
+        for req in SellerRequest.objects.raw(
+                'SELECT id, buyer_id, message FROM sell_sellerrequest WHERE LOWER(message)=%s AND buyer_id!=%s', ["processing", user.id]):
+            pending.append({
+                "req_id": str(req.id),
+                "buyer_id": str(req.buyer_id),
+                "message": req.message
+            })
     return pending
 
 

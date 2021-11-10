@@ -3,6 +3,7 @@
 # https://docs.djangoproject.com/en/3.2/topics/db/sql/
 from django.db import connection
 
+from Authentication.auth_handler import is_admin
 from Cart.models import Transaction
 from Main import settings
 from Store.models import Product
@@ -92,19 +93,7 @@ def fetchFullItem(itemID):
             """SELECT stripe_prod_id, title, image_1, image_2, image_3, image_4, image_5, description, price, 
             seller_uid, stripe_price_id FROM store_product WHERE store_product.stripe_prod_id=%s""",
             [itemID]):
-        return {
-            'ID': str(itemID),
-            'image_1': prod.image_1,
-            'image_2': prod.image_2,
-            'image_3': prod.image_3,
-            'image_4': prod.image_4,
-            'image_5': prod.image_5,
-            'title': prod.title,
-            'description': prod.description,
-            'price': str(prod.price),
-            'price_id': str(prod.stripe_price_id),
-            'seller_id': str(prod.seller_uid)
-        }
+        return __prod_to_dict(prod)
     return None
 
 
@@ -137,26 +126,20 @@ def insert_new_item_request(request):
     return [True, "Request Sent"]
 
 
-def fetch_new_item_requests():
+def fetch_new_item_requests_using(user):
     result_fetch = []
-    for prod in NewProductRequest.objects.raw(
-            'SELECT  id, seller_uid, title, short_description, description, price, category, image_1, image_2, image_3, image_4, image_5, message FROM sell_newproductrequest WHERE LOWER(message)=%s',
-            ["processing"]):
-        result_fetch.append({
-            'req_id': str(prod.id),
-            'seller_uid': str(prod.seller_uid),
-            'category': str(prod.category),
-            'image_1': prod.image_1,
-            'image_2': prod.image_2,
-            'image_3': prod.image_3,
-            'image_4': prod.image_4,
-            'image_5': prod.image_5,
-            'title': prod.title,
-            'price': str(prod.price),
-            'short_description': prod.short_description,
-            'description': prod.description,
-            'message': prod.message
-        })
+    if is_admin(user) and not user.is_superuser:
+        for prod in NewProductRequest.objects.raw(
+                """SELECT  id, seller_uid, title, short_description, description, price, category, image_1, image_2, image_3
+                , image_4, image_5, message FROM sell_newproductrequest WHERE LOWER(message)=%s AND seller_uid!=%s""",
+                ["processing", user.id]):
+            result_fetch.append(__prod_req_to_dict(prod))
+    elif user.is_superuser:
+        for prod in NewProductRequest.objects.raw(
+                """SELECT  id, seller_uid, title, short_description, description, price, category, image_1, image_2, image_3
+                , image_4, image_5, message FROM sell_newproductrequest WHERE LOWER(message)=%s""",
+                ["processing"]):
+            result_fetch.append(__prod_req_to_dict(prod))
     return result_fetch
 
 
@@ -226,21 +209,7 @@ def fetch_item_request_for_user(user):
     for prod in NewProductRequest.objects.raw(
             'SELECT  id, seller_uid, title, short_description, description, price, category, image_1, image_2, image_3, image_4, image_5, message FROM sell_newproductrequest WHERE seller_uid=%s',
             [str(user.id)]):
-        result_fetch.append({
-            'req_id': str(prod.id),
-            'seller_uid': str(prod.seller_uid),
-            'category': str(prod.category),
-            'image_1': prod.image_1,
-            'image_2': prod.image_2,
-            'image_3': prod.image_3,
-            'image_4': prod.image_4,
-            'image_5': prod.image_5,
-            'title': prod.title,
-            'price': str(prod.price),
-            'short_description': prod.short_description,
-            'description': prod.description,
-            'message': prod.message
-        })
+        result_fetch.append(__prod_req_to_dict(prod))
     return result_fetch
 
 
@@ -249,19 +218,7 @@ def fetch_seller_listed_items(user):
     for prod in Product.objects.raw(
             'SELECT stripe_prod_id, title, image_1, short_description, price, category, seller_uid, available_quantity FROM store_product WHERE seller_uid=%s',
             [user.id]):
-        items.append({
-            'ID': str(prod.stripe_prod_id),
-            'image_1': prod.image_1,
-            'image_2': prod.image_2,
-            'image_3': prod.image_3,
-            'image_4': prod.image_4,
-            'image_5': prod.image_5,
-            'title': prod.title,
-            'description': prod.description,
-            'price': str(prod.price),
-            'seller_id': str(prod.seller_uid),
-            'inventory': str(prod.available_quantity)
-        })
+        items.append(__prod_to_dict(prod))
     return items
 
 
@@ -319,3 +276,38 @@ def failed_un_reserve(itemID):
                     [itemID])
                 return True
     return False
+
+
+def __prod_req_to_dict(prod):
+    return {
+        'req_id': str(prod.id),
+        'seller_uid': str(prod.seller_uid),
+        'category': str(prod.category),
+        'image_1': prod.image_1,
+        'image_2': prod.image_2,
+        'image_3': prod.image_3,
+        'image_4': prod.image_4,
+        'image_5': prod.image_5,
+        'title': prod.title,
+        'price': str(prod.price),
+        'short_description': prod.short_description,
+        'description': prod.description,
+        'message': prod.message
+    }
+
+
+def __prod_to_dict(prod):
+    return {
+        'ID': str(prod.stripe_prod_id),
+        'image_1': prod.image_1,
+        'image_2': prod.image_2,
+        'image_3': prod.image_3,
+        'image_4': prod.image_4,
+        'image_5': prod.image_5,
+        'title': prod.title,
+        'description': prod.description,
+        'price': prod.price,
+        'price_id': str(prod.stripe_price_id),
+        'seller_id': str(prod.seller_uid),
+        'inventory': str(prod.available_quantity)
+    }

@@ -10,45 +10,84 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
-from Authentication.auth_handler import is_seller, is_buyer
+from Authentication.auth_handler import is_seller, is_buyer, is_admin
+from Authentication.views import generate_key
 from Cart.cart_handler import insert_new_transaction, succeed_transaction, fail_transaction
 from Store.models import Product
 from Utils.all_urls import all_urls
 from Utils.item_handler import reserve_item, fetchFullItem
+
+from datetime import datetime
+import pyotp
+import string
+import random
+import base64
+from django.core.mail import send_mail
+
+# Time after which OTP will expire
+EXPIRY_TIME = 120  # seconds
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class CreateCheckoutSessionView(View):
     def post(self, request, *args, **kwargs):
-        item = fetchFullItem(self.kwargs["pk"])
-        YOUR_DOMAIN = "http://127.0.0.1:80"  # change in production
-        if not request.user.is_authenticated:
-            return redirect(all_urls["login"])
-        elif not (is_buyer(request.user) or is_seller(request.user)):
-            return HttpResponse("<h1>Error</h1><p>Account Not Verified</p>")
-        elif reserve_item(item["ID"]):
-            checkout_session = stripe.checkout.Session.create(
-                payment_method_types=['card'],
-                line_items=[
-                    {
-                        'price': item["price_id"],
-                        'quantity': 1,
-                    },
-                ],
-                mode='payment',
-                success_url=YOUR_DOMAIN + '/success/',
-                cancel_url=YOUR_DOMAIN + '/cancel/',
-                expires_at=(int(time.time() + 3602)),
-                shipping_address_collection={"allowed_countries":["IN"]}
-            )
-            insert_new_transaction(item["seller_id"],
-                                   item["ID"], request.user.id,
-                                   item["price"], checkout_session["id"])
-            request.session["checking_out"] = checkout_session["id"]
-            return redirect(checkout_session.url)
+        request.session["payment_item_id"] = self.kwargs["pk"]
+        user = request.user
+        if user.is_authenticated and (is_buyer(user) or is_seller(user) or is_admin(user)):
+            email = user.email
+            keygen = generate_key(''.join(random.choices(string.ascii_uppercase + string.digits, k=10))) + user.email
+            key = base64.b32encode(keygen.encode())
+            OTP = pyotp.TOTP(key, interval=EXPIRY_TIME)  # do not take this out of this scope
+            subject = 'OTP validation'
+            message = 'Hey,\nBelow is the 6 digit otp:\n' + str(
+                OTP.now()) + '\n\nthis is a system generated mail. Do not reply'
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [email]
+            send_mail(subject, message, email_from, recipient_list)
+            request.session['otp_key_payment'] = keygen
+            request.session['otp_user_id_payment'] = user.id
+
+            redirect_to = "/otp/payment"
+            return redirect(redirect_to)
         else:
-            return HttpResponse("<h1>Error</h1><p>Out Of Stock</p>")
+            return HttpResponse("<h1>Error</h1><p>Permission Denied</p>")
+
+    def get(self, request, *args, **kwargs):
+        if "otp_payment_success" in request.session.keys() and "payment_item_id" in request.session:
+            request.session.pop("otp_payment_success")
+            item = fetchFullItem(request.session["payment_item_id"])
+            request.session.pop("payment_item_id")
+            YOUR_DOMAIN = "http://127.0.0.1:80"  # change in production
+            if not request.user.is_authenticated:
+                return redirect(all_urls["login"])
+            elif not (is_buyer(request.user) or is_seller(request.user) or is_admin(request.user)):
+                return HttpResponse("<h1>Error</h1><p>Account Not Verified</p>")
+            elif reserve_item(item["ID"]):
+                checkout_session = stripe.checkout.Session.create(
+                    customer_email=request.user.email,
+                    payment_method_types=['card'],
+                    line_items=[
+                        {
+                            'price': item["price_id"],
+                            'quantity': 1,
+                        },
+                    ],
+                    mode='payment',
+                    success_url=YOUR_DOMAIN + '/success/',
+                    cancel_url=YOUR_DOMAIN + '/cancel/',
+                    expires_at=(int(time.time() + 3602)),
+                    shipping_address_collection={"allowed_countries": ["IN"]}
+                )
+                insert_new_transaction(item["seller_id"],
+                                       item["ID"], request.user.id,
+                                       item["price"], checkout_session["id"])
+                request.session["checking_out"] = checkout_session["id"]
+                return redirect(checkout_session.url)
+            else:
+                return HttpResponse("<h1>Error</h1><p>Out Of Stock</p>")
+        else:
+            return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
 
 
 class SuccessView(TemplateView):

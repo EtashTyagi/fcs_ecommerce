@@ -16,11 +16,6 @@
         <script src="{% static 'js/bootstrap/bootstrap.min.js' %}"></script>
 </head>
 <header>
-    {% block header %}
-            {% with active="Login"%}
-            {% include 'Components/Header.html' %}
-            {% endwith %}
-        {% endblock header %}
 </header>
 
 <body>
@@ -54,10 +49,5 @@
 
 </body>
 <footer>
-            {% block footer %}
-            {% with active="Login" %}
-            {% include 'Components/Footer.html' %}
-            {% endwith %}
-        {% endblock footer %}
 </footer>
 </html>

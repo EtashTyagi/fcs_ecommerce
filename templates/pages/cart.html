@@ -60,11 +60,11 @@
                                             {% if item.available_quantity == "0" %}Out Of Stock{% else %}Checkout{% endif %}
                                         </button>
                                         <div class="modal fade" id="modal_{{ item.ID }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel_{{ item.ID }}" aria-hidden="true">
-                                                <div class="modal-dialog" role="document">
+                                                <div class="modal-dialog">
                                                     <div class="modal-content">
                                                       <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel_{{ item.ID }}">Do you want to checkout?</h5>
-                                                        <button type="button" class="close btn btn-light"  data-dismiss="modal" aria-label="Close">
+                                                        <button type="button" class="close btn btn-light" data-dismiss="modal" aria-label="Close">
                                                           <span aria-hidden="true">&times;</span>
                                                         </button>
                                                       </div>
@@ -77,8 +77,22 @@
                                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                                                           <form action="{% url 'create-checkout-session' item.ID %}" method="post">
                                                               {% csrf_token %}
-                                                            <button type="submit" class="btn btn-primary">Continue</button>
+                                                            <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#modal_otp{{ item.ID }}" data-dismiss="modal_2">
+                                                                Continue
+                                                            </button>
                                                           </form>
+                                                          <div class="modal fade" id="modal_otp{{ item.ID }}" tabindex="-1" aria-hidden="true">
+                                                              <div class="modal-dialog">
+                                                                  <div class="modal-content">
+                                                                      <div class="modal-header">
+                                                                          <h5 class="modal-title" id="exampleModalLabel_login">Processing Request</h5>
+                                                                      </div>
+                                                                      <div class="modal-body">
+                                                                          Please Wait!
+                                                                      </div>
+                                                                  </div>
+                                                              </div>
+                                                          </div>
                                                       </div>
                                                     </div>
                                                 </div>

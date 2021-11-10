@@ -24,13 +24,26 @@
         {% endblock header %}
     </header>
     <body >
-        <div style="min-height: calc(100vh - 160px); background: antiquewhite">
-            <div class="card-deck d-flex flex-wrap mx-2 py-3 justify-content-center">
+        <div style="min-height: calc(100vh - 160px); background: antiquewhite;" class="d-flex flex-column align-items-center">
+            <div class="d-flex flex-wrap mx-2 my-3 justify-content-center card align-items-center bg-light flex-row" style="width: 90%; max-width: 1125px">
+            <span class="h1 w-100 text-center text-white-75 card-header" style="background: lightgrey">{% if q == "" and c == "" %}Welcome To Store!{% elif q == "" %}Category: {{ c }}{% elif c == "" %}Search Results For "{{ q }}"{% else %}
+            Search Results For "{{ q }} In Category: "{{ c }}"
+        {% endif %}</span>
+            <style>
+                .btn-outline-light-success:hover{
+                    background: rgb(135,215,250);
+background: linear-gradient(0deg, rgba(225,225,225, 0.75) 15%, rgba(255, 190, 200, 0.5) 55%);
+                }
+            </style>
+            {% if items.len == 0 %}
+                <span class="h2 text-danger">No Items Found!</span>
+            {% else %}
             {% for item in items %}
                 {% block content %}
                     {% include 'Components/item_card.html' %}
                 {% endblock content %}
             {% endfor %}
+            {% endif %}
             </div>
         </div>
     </body>
