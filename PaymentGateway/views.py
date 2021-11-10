@@ -58,7 +58,7 @@ class CreateCheckoutSessionView(View):
             request.session.pop("otp_payment_success")
             item = fetchFullItem(request.session["payment_item_id"])
             request.session.pop("payment_item_id")
-            YOUR_DOMAIN = "http://127.0.0.1:80"  # change in production
+            YOUR_DOMAIN = "https://192.168.3.51"  # change in production
             if not request.user.is_authenticated:
                 return redirect(all_urls["login"])
             elif not (is_buyer(request.user) or is_seller(request.user) or is_admin(request.user)):

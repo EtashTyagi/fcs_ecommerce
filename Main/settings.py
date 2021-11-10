@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure--pyusjbuve0rh^&*9j-nd)l55sw67l$@^hfy-!1c7zz--ol7s&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "192.168.1.10", "etash.com", "localhost"]
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -135,6 +135,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 STRIPE_PUBLIC_KEY = "pk_test_51JkPoKSBGHFum3RMzBSmkN39OdabCvtmEhxl979BGkFj9QKzpWyI9K91YTJSWEKqr7RrzBPLJGkolDqA85S98Ix4008pzSzFJg"

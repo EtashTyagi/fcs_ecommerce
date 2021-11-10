@@ -51,7 +51,7 @@ def create_user(request):
 
 def send_mail_after_registration(email, token):
     subject = 'Please Verify Your FCS Account'
-    message = f'Hey,\npaste the link in your browser or click on it to verify your account http://127.0.0.1:80/verify/{token} \nthis is a system generated mail. Do not reply'
+    message = f'Hey,\npaste the link in your browser or click on it to verify your account https://192.168.3.51/verify/{token} \nthis is a system generated mail. Do not reply'
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [email]
     send_mail(subject, message, email_from, recipient_list)
