@@ -1,5 +1,5 @@
 import stripe
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from Cart.cart_handler import is_in_cart, add_to_cart, remove_from_cart, cart_is_full
 from Utils.all_urls import all_urls
@@ -23,15 +23,22 @@ from Utils.item_handler import *
 def store(request):
     request.session.pop('login_to_continue_to', None)
     if request.method == "GET":
+        if len(request.GET) > 2:
+            return Http404("<h1>Error</h1><p>Bad Request</p>")
+        for test in request.GET:
+            if not(test == "q" or test == "c"):
+                return Http404("<h1>Error</h1><p>Bad Request</p>")
+
         args = {"items": fetchItems(request, search_in=["title", "short_description", "description"]),
                 "q": ("" if "q" not in request.GET or len(request.GET["q"]) == 0 else request.GET["q"][:-1]
                 if request.GET["q"][-1] == '/' else request.GET["q"]),
                 "c": ("" if "c" not in request.GET or len(request.GET["c"]) == 0 else request.GET["c"][:-1]
                 if request.GET["c"][-1] == '/' else request.GET["c"])
                 }
+
         return render(request, 'pages/store.html', args)
     else:
-        return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
+        return Http404("<h1>Error</h1><p>Bad Request</p>")
 
 
 def item(request):

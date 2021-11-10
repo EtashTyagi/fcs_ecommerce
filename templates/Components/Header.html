@@ -24,7 +24,6 @@
       </ul>
         {% if active == "Home" or active == "Store" or active == "Item"%}
             <form class="d-flex mx-0 mx-md-3 w-100 form-inline" id="searchbar_form" method="get" action="/store">
-                {% csrf_token %}
                 <div class="rounded-0 border-0 w-100 d-flex flex-row" id="autocomplete">
                     <div class="rounded-0 border-0 w-100 d-flex flex-row dropdown" style="cursor: text !important;" id="searchbar">
                         <select class="form-select p-0 rounded-0 rounded-start select2 select2-search--dropdown btn-success pe-4 ps-2" style="max-width: 90px" id="catdd"
