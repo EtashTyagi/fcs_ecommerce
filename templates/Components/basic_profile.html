@@ -45,13 +45,13 @@
                 <div class="w-100 d-flex flex-column">
                     {% if group == "buyer" or group == "seller" or group == "admin" %}
                     <div class="w-100">
-                        <button class="btn btn-primary w-100" data-toggle="modal" data-target="#modal_2" type="button" id="modal_1">Modify Profile</button>
+                        <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#modal_2" type="button" id="modal_1">Modify Profile</button>
                                         <div class="modal fade" id="modal_2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel_1" aria-hidden="true">
                                                 <div class="modal-dialog" role="document">
                                                     <div class="modal-content">
                                                       <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel_1">Change Details</h5>
-                                                        <button type="button" class="close btn btn-light"  data-dismiss="modal" aria-label="Close">
+                                                        <button type="button" class="close btn btn-light"  data-bs-dismiss="modal" aria-label="Close">
                                                           <span aria-hidden="true">&times;</span>
                                                         </button>
                                                       </div>
@@ -84,7 +84,7 @@
                                                       </div>
                                                       <div class="modal-footer">
                                                           <button type="submit" name="modify_profile" class="btn btn-primary">Submit</button>
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 
                                                       </div>
                                                             </form>
@@ -117,7 +117,7 @@
                         <div class="dropdown w-100 mt-1">
                           <button class="btn btn-dark dropdown-toggle w-100"
                                   type="button" id="dropdownMenuButton"
-                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Handle Requests
                           </button>
                           <div class="dropdown-menu dropdown-menu-dark w-100" aria-labelledby="dropdownMenuButton">

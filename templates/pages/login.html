@@ -8,12 +8,9 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>FCS | Login</title>
 
-    <!-- Bootstrap -->
-        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-        <script src="{% static 'js/bootstrap/jquery-3.2.1.slim.min.js' %}"></script>
-        <script src="{% static 'js/bootstrap/popper.min.js' %}"></script>
-        <script src="{% static 'js/bootstrap/bootstrap_4.min.js' %}"></script>
-        <script src="{% static 'js/bootstrap/bootstrap.min.js' %}"></script>
+        <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </head>
 <header>
     {% block header %}
@@ -309,11 +306,11 @@ window.addEventListener("DOMContentLoaded", function () {
             </label>
             <div class="d-flex flex-column align-items-center mt-2 w-100" href="/">
                 <label style="max-width: 75%">
-                    <button class="btn btn-success" style=" width: 125px; max-width: 100%;" type="submit" data-toggle="modal" data-target="#modal_login" id="modal_button_login">
+                    <button class="btn btn-success" style=" width: 125px; max-width: 100%;" type="submit" data-bs-toggle="modal" data-bs-target="#modal_login" id="modal_button_login">
                         Log In
                     </button>
                 </label>
-                <div class="modal fade" id="modal_login" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel_login" aria-hidden="true" data-keyboard="false">
+                <div class="modal fade" id="modal_login" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel_login" aria-hidden="true" data-keyboard="false">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                               <div class="modal-header">

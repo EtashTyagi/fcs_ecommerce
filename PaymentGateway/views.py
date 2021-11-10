@@ -144,12 +144,10 @@ class StripeIntentView(View):
                     "price_id": product.stripe_price_id
                 }
             )
-            print("Something")
             return JsonResponse({
                 'clientSecret': intent['client_secret']
             })
         except Exception as e:
-            print("Failed")
             return JsonResponse({'error': str(e)})
 
 
@@ -157,7 +155,6 @@ class CustomPaymentView(TemplateView):
     template_name = "pages/custom_payment.html"
 
     def get_context_data(self, **kwargs):
-        print("CUSTOM PAYMENT")
         product = Product.objects.get(stripe_prod_id=1)
         prices = Product.objects.get(stripe_price_id=1)
         context = super(CustomPaymentView, self).get_context_data(**kwargs)
