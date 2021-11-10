@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
@@ -36,7 +36,7 @@ def profile(request):
         if request.user.is_authenticated:
             try:
                 user = User.objects.get(id=usr_id)
-                if user:
+                if user and (len(request.GET) == 0 or (len(request.GET) == 1 and "id" in request.GET)):
                     args = {"group": None, "id": user.id, "email": user.email, "owner": user.id == request.user.id,
                             "username": user.username, "first_name": user.first_name, "last_name": user.last_name,
                             "phone_number": get_phone_number(user)}
@@ -49,8 +49,10 @@ def profile(request):
                     else:
                         args["group"] = ""
                     return render(request, 'pages/main_profile.html', args)
+                else:
+                    return Http404("<h1>Error</h1><p>Bad Request!</p>")
             except Exception as e:
-                return HttpResponse("<h1>Error</h1><p>User Not Found!</p>")
+                return Http404("<h1>Error</h1><p>User Not Found!</p>")
         else:
             request.session['login_to_continue_to'] = all_urls["profile"]
             return redirect(all_urls["login"])

@@ -21,14 +21,19 @@ def search(request):
     MAX_RES = 10
     if request.method == "GET":
         payload = []
-        if "sc" in request.GET:
-            payload = fetchCategories()
+        if len(request.GET) == 1 and ("sc" in request.GET or "c" in request.GET or "q" in request.GET) \
+                or len(request.GET) == 2 and ("c" in request.GET and "q" in request.GET):
+            if "sc" in request.GET:
+                payload = fetchCategories()
+            else:
+                payload = fetchItems(request, search_in=["title"], limit=MAX_RES)
+            return JsonResponse({'status': 200, 'data': payload[0:min(MAX_RES, len(payload))]})
         else:
-            payload = fetchItems(request, search_in=["title"], limit=MAX_RES)
-        return JsonResponse({'status': 200, 'data': payload[0:min(MAX_RES, len(payload))]})
+            return HttpResponse("<h1>Error</h1><p>Invalid Parameters!</p>")
     else:
         return HttpResponse("<h1>Error</h1><p>Bad Request, only GET allowed!</p>")
 
+
 all_views = {
-    "search":  search
+    "search": search
 }
