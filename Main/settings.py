@@ -135,8 +135,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 
 STRIPE_PUBLIC_KEY = "pk_test_51JkPoKSBGHFum3RMzBSmkN39OdabCvtmEhxl979BGkFj9QKzpWyI9K91YTJSWEKqr7RrzBPLJGkolDqA85S98Ix4008pzSzFJg"
 STRIPE_SECRET_KEY = "sk_test_51JkPoKSBGHFum3RMJIqC2NVQfSNoZK3vpFTvvZSyE9S3R67RURuC1DWTobnGGzFQEKzOulG89pMhuwg6wLxfb6LM00eGwcEEjO"

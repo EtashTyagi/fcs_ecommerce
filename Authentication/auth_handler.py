@@ -2,7 +2,7 @@
 # https://docs.djangoproject.com/en/3.2/topics/db/sql/
 
 from django.contrib.auth import logout
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.contrib.sessions.models import Session
 from django.core.exceptions import ValidationError
 from django.db import connection
@@ -14,8 +14,6 @@ from Utils.upload_handler import FileValidator, upload_request_pdf_file, delete_
 import uuid
 from .models import Unverified_User
 from django.core.mail import send_mail
-
-
 
 common_passwords = ["password", "12345678"]  # store in sql maybe?
 
@@ -73,21 +71,21 @@ def is_admin(user):
 
 def make_seller(user):
     try:
-        group = User.objects.get(name="buyer")
+        group = Group.objects.get(name="buyer")
         user.groups.remove(group)
     except Exception as ignore:
         print(ignore)
-    group = User.objects.get(name="seller")
+    group = Group.objects.get(name="seller")
     user.groups.add(group)
 
 
 def make_buyer(user):
     try:
-        group = User.objects.get(name="seller")
+        group = Group.objects.get(name="seller")
         user.groups.remove(group)
     except Exception as ignore:
         print(ignore)
-    group = User.objects.get(name="buyer")
+    group = Group.objects.get(name="buyer")
     user.groups.add(group)
 
 
@@ -103,7 +101,7 @@ def authenticate_user(request):
             return [True, None, user_identified.id]
         else:
             return [False, "Wrong Credentials"]
-        
+
     except Exception as e:
         print(e)
         return [False, "Wrong Credentials"]
@@ -258,7 +256,8 @@ def get_all_seller_requests_using(user):
             })
     elif is_admin(user):
         for req in SellerRequest.objects.raw(
-                'SELECT id, buyer_id, message FROM sell_sellerrequest WHERE LOWER(message)=%s AND buyer_id!=%s', ["processing", user.id]):
+                'SELECT id, buyer_id, message FROM sell_sellerrequest WHERE LOWER(message)=%s AND buyer_id!=%s',
+                ["processing", user.id]):
             pending.append({
                 "req_id": str(req.id),
                 "buyer_id": str(req.buyer_id),

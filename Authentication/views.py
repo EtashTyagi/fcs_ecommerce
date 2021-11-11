@@ -119,6 +119,7 @@ def email_verified(request):
 
 
 def verify(request, auth_token):
+    request.session.pop('redirect_from_signup',None)
     try:
         profile_obj = Unverified_User.objects.filter(auth_token=auth_token).first()
 
