@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
-from Authentication.auth_handler import is_seller, make_seller_request, get_seller_request_status
+from Utils.auth_handler import is_seller, make_seller_request, get_seller_request_status
 from Utils.all_urls import all_urls
 from Utils.item_handler import *
 

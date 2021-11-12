@@ -1,12 +1,9 @@
-from django.contrib import admin
+from Utils.auth_handler import *
 from django.http import HttpResponse, Http404
-from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
-from Cart.cart_handler import fetchCart, is_in_cart, add_to_cart, remove_from_cart
 from Utils.all_urls import all_urls
 from Utils.item_handler import *
-from Authentication.auth_handler import *
 from Utils.upload_handler import download_request_pdf_file
 
 """ Define All HTML Views To Render Here in all_views list with appropriate name"""

@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.db import models
-import django.contrib.auth
+
+User = settings.AUTH_USER_MODEL
 
 
-class NewProductRequest(models.Model):
-    seller_uid = models.IntegerField()
+class New_Product_Request(models.Model):
+    seller = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=25)
     short_description = models.CharField(max_length=200)
     description = models.CharField(max_length=5000)
@@ -20,9 +22,9 @@ class NewProductRequest(models.Model):
         return self.title
 
 
-class SellerRequest(models.Model):
-    buyer_id = models.IntegerField()
+class Seller_Request(models.Model):
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.CharField(max_length=2000)
 
     def __str__(self):
-        return self.buyer_id
+        return self.buyer

@@ -1,8 +1,8 @@
-import stripe
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
-from Cart.cart_handler import is_in_cart, add_to_cart, remove_from_cart, cart_is_full
+
 from Utils.all_urls import all_urls
+from Utils.cart_handler import is_in_cart, add_to_cart, remove_from_cart, cart_is_full
 from Utils.item_handler import *
 
 """ Define All HTML Views To Render Here in all_views list with appropriate name"""

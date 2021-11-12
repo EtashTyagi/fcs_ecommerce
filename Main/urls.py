@@ -11,20 +11,20 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 
-import Authentication.views
+import authentication.views
 from Main.views import all_views
 from Utils.all_urls import all_urls
 
 urlpatterns = [
-    url(r'^admin/login/', Authentication.views.login),
+    url(r'^admin/login/', authentication.views.login),
     url(r'admin/', admin.site.urls),
-    path('', include('Store.urls')),
-    path('', include('Authentication.urls')),
-    path('', include('Cart.urls')),
-    path('', include('PaymentGateway.urls')),
-    path('', include('Profile.urls')),
-    path('', include('Search.urls')),
-    path('', include('Sell.urls'))
+    path('', include('store.urls')),
+    path('', include('authentication.urls')),
+    path('', include('cart.urls')),
+    path('', include('payment_gateway.urls')),
+    path('', include('profile.urls')),
+    path('', include('search.urls')),
+    path('', include('sell.urls'))
 ]
 
 for key in all_views.keys():

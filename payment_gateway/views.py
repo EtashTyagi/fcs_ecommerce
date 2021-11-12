@@ -1,31 +1,24 @@
+import base64
 import json
+import random
+import string
 import time
 
+import pyotp
 import stripe
-
+from Utils.cart_handler import insert_new_transaction, succeed_transaction, fail_transaction
+from store.models import Product
 from django.conf import settings
 from django.core.mail import send_mail
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
-from Authentication.auth_handler import is_seller, is_buyer, is_admin
-from Authentication.views import generate_key
-from Cart.cart_handler import insert_new_transaction, succeed_transaction, fail_transaction
-from Store.models import Product
+
 from Utils.all_urls import all_urls
+from Utils.auth_handler import generate_key, EXPIRY_TIME
+from Utils.auth_handler import is_seller, is_buyer, is_admin
 from Utils.item_handler import reserve_item, fetchFullItem
-
-from datetime import datetime
-import pyotp
-import string
-import random
-import base64
-from django.core.mail import send_mail
-
-# Time after which OTP will expire
-EXPIRY_TIME = 120  # seconds
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 

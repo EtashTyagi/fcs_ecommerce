@@ -1,13 +1,16 @@
 from django.db import models
+from django.conf import settings
+from store.models import Product
+
+User = settings.AUTH_USER_MODEL
 
 
-class Transaction(models.Model):
-    seller_id = models.IntegerField(default=None, blank=True, null=True)
-    item_id = models.CharField(max_length=100, default=None, blank=True, null=True)
-    buyer_id = models.IntegerField(default=None, blank=True, null=True)
-    price = models.DecimalField(max_digits=13, decimal_places=2)
-    stripe_transaction_id = models.CharField(max_length=100, primary_key=True)
-    status = models.CharField(max_length=200)
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    item = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.stripe_transaction_id
+        return "user=" + str(self.user) + "; item=" + str(self.item)
+
+
+

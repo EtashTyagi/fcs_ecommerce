@@ -1,21 +1,16 @@
+import base64
+import random
+import string
+
+import pyotp
+from django.contrib import auth
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from Authentication.auth_handler import *
 from Utils.all_urls import all_urls
+from Utils.auth_handler import *
 from .models import Unverified_User
-from django.contrib import messages, auth
-
-from datetime import datetime
-import pyotp
-import string
-import random
-import base64
-from django.core.mail import send_mail
-
-# Time after which OTP will expire
-EXPIRY_TIME = 120  # seconds
 
 """ Define All HTML Views To Render Here in all_views list with appropriate name"""
 """ View Format (Follow Strictly !!!!):
@@ -119,7 +114,7 @@ def email_verified(request):
 
 
 def verify(request, auth_token):
-    request.session.pop('redirect_from_signup',None)
+    request.session.pop('redirect_from_signup', None)
     try:
         profile_obj = Unverified_User.objects.filter(auth_token=auth_token).first()
 
@@ -138,10 +133,6 @@ def verify(request, auth_token):
 
 def error_page(request):
     return render(request, 'pages/error_page.html')
-
-
-def generate_key(random_string):
-    return str(datetime.date(datetime.now())) + random_string
 
 
 def otp(request):

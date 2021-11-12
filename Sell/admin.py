@@ -1,8 +1,14 @@
 from django.contrib import admin
-from .models import NewProductRequest
+from .models import *
 
 
-class ProductAdmin(admin.ModelAdmin):
+class New_Product_RequestAdmin(admin.ModelAdmin):
     pass
 
-admin.site.register(NewProductRequest, ProductAdmin)
+
+class Seller_RequestAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(New_Product_Request, New_Product_RequestAdmin)
+admin.site.register(Seller_Request, Seller_RequestAdmin)

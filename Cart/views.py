@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
-from Authentication.auth_handler import is_seller, is_buyer, is_admin
-from Cart.cart_handler import fetchCart, is_in_cart, remove_from_cart
+from Utils.auth_handler import is_seller, is_buyer, is_admin
+from Utils.cart_handler import fetchCart, is_in_cart, remove_from_cart
 from Utils.all_urls import all_urls
 
 """ Define All HTML Views To Render Here in all_views list with appropriate name"""

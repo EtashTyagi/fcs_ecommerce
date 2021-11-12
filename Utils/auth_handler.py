@@ -1,21 +1,19 @@
 # IMPORTANT: PLEASE DO NOT USE FORMAT STRING IN RAW SQL QUERIES, IT WILL CAUSE SQL INJECTIONS
 # https://docs.djangoproject.com/en/3.2/topics/db/sql/
+from datetime import datetime
 
 from django.contrib.auth import logout
 from django.contrib.auth.models import Group, User
-from django.contrib.sessions.models import Session
 from django.core.exceptions import ValidationError
 from django.db import connection
 
 from Main import settings
-from Sell.models import SellerRequest
+from sell.models import Seller_Request
 from Utils.upload_handler import FileValidator, upload_request_pdf_file, delete_request_pdf_file
 
 import uuid
-from .models import Unverified_User
+from authentication.models import Unverified_User, Common_Passwords
 from django.core.mail import send_mail
-
-common_passwords = ["password", "12345678"]  # store in sql maybe?
 
 
 def create_user(request):
@@ -37,8 +35,8 @@ def create_user(request):
         created.save()
         add_phone_number(created.id, phone)
         auth_token = str(uuid.uuid4())
-        profile_obj = Unverified_User.objects.create(user=created, auth_token=auth_token)
-        profile_obj.save()
+        unverified_user = Unverified_User.objects.create(user=created, auth_token=auth_token)
+        unverified_user.save()
         send_mail_after_registration(email, auth_token)
         return [True, created]
 
@@ -48,23 +46,24 @@ def create_user(request):
 # TODO: change the below link at time of production
 
 def send_mail_after_registration(email, token):
-    subject = 'Please Verify Your FCS Account'
-    message = f'Hey,\npaste the link in your browser or click on it to verify your account https://192.168.3.51/verify/{token} \nthis is a system generated mail. Do not reply'
+    subject = 'Please Verify Your Account'
+    message = f"""Hey,\npaste the link in your browser or click on it to verify your account 
+                    http://127.0.0.1/verify/{token} \nthis is a system generated mail. Do not reply"""
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [email]
     send_mail(subject, message, email_from, recipient_list)
 
 
 def is_seller(user):
-    return user.groups.filter(name='seller').exists()
+    return user.is_authenticated and user.groups.filter(name='seller').exists()
 
 
 def is_buyer(user):
-    return user.groups.filter(name='buyer').exists()
+    return user.is_authenticated and user.groups.filter(name='buyer').exists()
 
 
 def is_admin(user):
-    if user.is_superuser or user.groups.filter(name='admin').exists():
+    if user.is_authenticated and (user.is_superuser or user.groups.filter(name='admin').exists()):
         return True
     return False
 
@@ -96,7 +95,6 @@ def authenticate_user(request):
     try:
         user_identified = User.objects.get(username=username)
         if user_identified.check_password(password):
-            # [s.delete() for s in Session.objects.all() if s.get('_auth_user_id') == user_identified.id]
             user_identified.is_active = False
             return [True, None, user_identified.id]
         else:
@@ -154,7 +152,7 @@ def validate_email(email):
     try:
         User.objects.get(email=email)
         return [False, "Email Already Registered"]
-    except Exception as e:
+    except Exception as ignore:
         return [True, None]
 
 
@@ -165,24 +163,26 @@ def validate_password(password, password_conf):
         return [False, "Password Too Small"]
     elif len(password) > 32:
         return [False, "Password Too Long"]
-    elif password in common_passwords:
+    elif Common_Passwords.objects.exists(password=password):
         return [False, "Password Too Common"]
 
     return [True, None]
 
 
 def validate_phone(phone_number):
-    return [len(str(phone_number)) == 10, None if len(str(phone_number)) == 10 else "Invalid Phone Number"]
+    valid = len(str(phone_number)) == 10 and str(phone_number).isnumeric()
+    return [valid, None if valid else "Invalid Phone Number"]
 
 
 def add_phone_number(user_id, phone_number):
     with connection.cursor() as cursor:
-        cursor.execute("INSERT INTO phone_numbers VALUES (%s, %s)", [user_id, phone_number])
+        cursor.execute("INSERT INTO authentication_phone_number(user_id, phone_number) VALUES (%s, %s)",
+                       [user_id, phone_number])
 
 
 def get_phone_number(user):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM phone_numbers WHERE user_id=%s", [user.id])
+        cursor.execute("SELECT * FROM authentication_phone_number WHERE user_id=%s", [user.id])
         result_set = cursor.fetchall()
         for row in result_set:
             return row[1]
@@ -192,7 +192,8 @@ def update_phone_number(user, new_phone_number):
     validation = validate_phone(new_phone_number)
     if validation[0]:
         with connection.cursor() as cursor:
-            cursor.execute("UPDATE phone_numbers SET phone_number=%s WHERE user_id=%s", [new_phone_number, user.id])
+            cursor.execute("UPDATE authentication_phone_number SET phone_number=%s WHERE user_id=%s", [new_phone_number,
+                                                                                                       user.id])
     return validation
 
 
@@ -207,10 +208,11 @@ def logout_user(request):
 def make_seller_request(request):
     if request.method == "POST" and not is_seller(request.user):
         processing = False
-        for req in SellerRequest.objects.raw(
-                'SELECT id FROM sell_sellerrequest WHERE buyer_id=%s AND LOWER(message)=%s',
+        for req in Seller_Request.objects.raw(
+                'SELECT id FROM sell_seller_request WHERE buyer_id=%s AND LOWER(message)=%s',
                 [request.user.id, "processing"]):
             processing = True
+            break
 
         if processing:
             return [False, "Request Is Being Processed By Admin!"]
@@ -222,9 +224,7 @@ def make_seller_request(request):
                 try:
                     upload_request_pdf_file(file, user_id=request.user.id)
                     with connection.cursor() as cursor:
-                        cursor.execute("""INSERT INTO sell_sellerrequest
-                        (buyer_id, message)
-                         VALUES (%s, %s)""",
+                        cursor.execute("""INSERT INTO sell_seller_request(buyer_id, message) VALUES (%s, %s)""",
                                        [str(request.user.id), "Processing"])
                 except OSError:
                     return [False, "Too Many Requests"]
@@ -238,55 +238,65 @@ def make_seller_request(request):
 
 
 def get_seller_request_status(user):
-    for req in SellerRequest.objects.raw(
-            'SELECT id, buyer_id, message FROM sell_sellerrequest WHERE buyer_id=%s', [user.id]):
-        return req.message
-    return "You Are Not A Verified Seller."
+    if user.is_authenticated and is_buyer(user):
+        for req in Seller_Request.objects.raw(
+                'SELECT id, buyer_id, message FROM sell_seller_request WHERE buyer_id=%s', [user.id]):
+            return req.message
+        return "You Are Not A Verified Seller."
+    return "Bad Request"
 
 
 def get_all_seller_requests_using(user):
     pending = []
     if user.is_superuser:
-        for req in SellerRequest.objects.raw(
-                'SELECT id, buyer_id, message FROM sell_sellerrequest WHERE LOWER(message)=%s', ["processing"]):
+        for req in Seller_Request.objects.raw(
+                'SELECT id, buyer_id, message FROM sell_seller_request WHERE LOWER(message)=%s', ["processing"]):
             pending.append({
                 "req_id": str(req.id),
-                "buyer_id": str(req.buyer_id),
+                "buyer_id": str(req.buyer.id),
                 "message": req.message
             })
     elif is_admin(user):
-        for req in SellerRequest.objects.raw(
-                'SELECT id, buyer_id, message FROM sell_sellerrequest WHERE LOWER(message)=%s AND buyer_id!=%s',
+        for req in Seller_Request.objects.raw(
+                'SELECT id, buyer_id, message FROM sell_seller_request WHERE LOWER(message)=%s AND buyer_id!=%s',
                 ["processing", user.id]):
             pending.append({
                 "req_id": str(req.id),
-                "buyer_id": str(req.buyer_id),
+                "buyer_id": str(req.buyer.id),
                 "message": req.message
             })
     return pending
 
 
 def accept_seller_request(req_id):
-    for req in SellerRequest.objects.raw(
-            'SELECT id, buyer_id, message FROM sell_sellerrequest WHERE id=%s', [req_id]):
-        make_seller(User.objects.get(id=req.buyer_id))
-        delete_request_pdf_file(req.buyer_id)
+    for req in Seller_Request.objects.raw(
+            'SELECT id, buyer_id, message FROM sell_seller_request WHERE id=%s', [req_id]):
+        make_seller(User.objects.get(id=req.buyer.id))
+        delete_request_pdf_file(req.buyer.id)
         break
     with connection.cursor() as cursor:
-        cursor.execute("""DELETE FROM sell_sellerrequest WHERE id=%s""", [req_id])
+        cursor.execute("""DELETE FROM sell_seller_request WHERE id=%s""", [req_id])
 
 
 def reject_seller_request(req_id, message):
-    for req in SellerRequest.objects.raw(
-            'SELECT id, buyer_id, message FROM sell_sellerrequest WHERE id=%s', [req_id]):
-        delete_request_pdf_file(req.buyer_id)
+    for req in Seller_Request.objects.raw(
+            'SELECT id, buyer_id, message FROM sell_seller_request WHERE id=%s', [req_id]):
+        delete_request_pdf_file(req.buyer.id)
         break
     with connection.cursor() as cursor:
-        cursor.execute("""UPDATE sell_sellerrequest SET message=%s WHERE id=%s""", [message, req_id])
+        cursor.execute("""UPDATE sell_seller_request SET message=%s WHERE id=%s""", [message, req_id])
 
 
 def seller_request_exists(req_id):
-    for req in SellerRequest.objects.raw(
-            'SELECT id FROM sell_sellerrequest WHERE id=%s', [req_id]):
+    for req in Seller_Request.objects.raw(
+            'SELECT id FROM sell_seller_request WHERE id=%s', [req_id]):
         return True
     return False
+
+
+# Time after which OTP will expire
+EXPIRY_TIME = 120  # seconds
+
+
+def generate_key(random_string):
+    return str(datetime.date(datetime.now())) + random_string
