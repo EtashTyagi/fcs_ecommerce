@@ -8,7 +8,7 @@ Function views
     2. Write a renderer in views and include it in all_views dictionary with relevant info
 """
 from django.urls import path
-from Profile.views import all_views
+from profile.views import all_views
 from Utils.all_urls import all_urls
 
 urlpatterns = [path(all_urls[key][1:], all_views[key]) for key in all_views.keys()]
