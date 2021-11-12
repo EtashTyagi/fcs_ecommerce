@@ -35,7 +35,7 @@
                         <div class="m-2" style="width: 600px; flex-grow: 2; max-width: 100%; ">
                             <div class="d-flex card p-0 text-start text-dark flex-row align-items-start justify-content-center p-1 pe-2 w-100 flex-wrap" style="background:rgba(0,0,0, 0.02);overflow: hidden">
                                 <div class="flex-grow-0 h-100 px-2 d-flex flex-column align-items-center justify-content-center" style="width: 300px">
-                                    <a href="/item?id={{ item.ID }}/">
+                                    <a href="{% url "item" %}?id={{ item.ID }}/">
                                         <img class="card-img-top card-img rounded-0 rounded-top" height="200px" width="300px" style="object-fit: contain" src='{{ item.image }}' alt='{{ item.title }}'>
                                     </a>
                                     <div class="card-footer d-flex flex-row align-items-center" style="width:300px; max-height: 36px;overflow: hidden">
@@ -95,7 +95,6 @@
                                                           </div>
                                     <script>
                                                               document.getElementById('modal_otp{{ item.ID }}').addEventListener('shown.bs.modal', function () {
-                                                                  console.log("YES")
                                                                   document.getElementById('modal_{{ item.ID }}').style.display = "none"
                                                             })
                                                           </script>

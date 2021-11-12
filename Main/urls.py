@@ -28,4 +28,4 @@ urlpatterns = [
 ]
 
 for key in all_views.keys():
-    urlpatterns.append(path(all_urls[key][1:], all_views[key]))
+    urlpatterns.append(path(all_urls[key][1:], all_views[key], name=key))

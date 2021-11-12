@@ -93,7 +93,7 @@
                                         </div>
                     </div>
                     <div class="mt-1 w-100">
-                        <a class="btn btn-secondary w-100" href="/purchases/">Purchases</a>
+                        <a class="btn btn-secondary w-100" href="{% url "purchases"%}">Purchases</a>
                     </div>
                     {% else %}
                     <div class="mt-1 w-100">
@@ -102,17 +102,17 @@
                     {% endif %}
                     {% if group == "buyer" %}
                         <div class="mt-1 w-100">
-                            <a class="btn btn-success w-100" href="/sell/">Become A Seller</a>
+                            <a class="btn btn-success w-100" href="{% url "sell" %}">Become A Seller</a>
                         </div>
                     {% endif %}
                     {% if group == "seller" or group == "admin"%}
                         <div class="mt-1 w-100">
-                            <a class="btn btn-success w-100" href="/sell/">Sell Panel</a>
+                            <a class="btn btn-success w-100" href="{% url "sell" %}">Sell Panel</a>
                         </div>
                     {% endif %}
                     {% if group == "admin" %}
                         <div class="mt-1 w-100 d-flex flex-row">
-                            <a class="btn btn-danger w-100" href="/admin/">Admin Panel</a>
+                            <a class="btn btn-danger w-100" href="{% url 'admin:index' %}">Admin Panel</a>
                         </div>
                         <div class="dropdown w-100 mt-1">
                           <button class="btn btn-dark dropdown-toggle w-100"
@@ -121,8 +121,8 @@
                             Handle Requests
                           </button>
                           <div class="dropdown-menu dropdown-menu-dark w-100" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="/item_handler/">New Item</a>
-                            <a class="dropdown-item" href="/seller_handler/">New Seller</a>
+                            <a class="dropdown-item" href="{% url "admin_response_to_new_item_request" %}">New Item</a>
+                            <a class="dropdown-item" href="{% url "admin_response_to_seller_request" %}">New Seller</a>
                           </div>
                         </div>
                     {% endif %}

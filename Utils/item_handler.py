@@ -21,7 +21,7 @@ import stripe
 
 def fetchCategories():
     categories = []
-    for prod in Product.objects.raw('SELECT DISTINCT(category), stripe_prod_id FROM store_product'):
+    for prod in Product.objects.raw('SELECT DISTINCT(category),1 stripe_prod_id FROM store_product'):
         categories.append(prod.category.title())
     return categories
 
@@ -38,7 +38,7 @@ def fetchItems(request, search_in=("title",), limit=float('inf')):
                                'title': prod.title,
                                'short_description': prod.short_description,
                                'price': str(prod.price),
-                               'seller_id': str(prod.seller_uid)}
+                               'seller_id': str(prod.seller_id)}
     done_ids = set({})
     get_limits = lambda: 2147483647 if limit == float('inf') or limit is not int or limit < 0 else limit
     if "title" in search_in:
@@ -103,7 +103,7 @@ def fetchFullItem(id):
 
 
 def insert_new_item_request(request):
-    seller_uid = request.user.id
+    seller_id = request.user.id
     title = request.POST["title"]
     short_description = request.POST["short_description"]
     description = request.POST["description"]
@@ -126,7 +126,7 @@ def insert_new_item_request(request):
             """INSERT INTO sell_new_product_request(seller_id, title, short_description, description, price, category, 
             image_1, image_2, image_3, image_4, image_5, message) 
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-            [seller_uid, title, short_description, description, price, prod_type, image_1, image_2, image_3,
+            [seller_id, title, short_description, description, price, prod_type, image_1, image_2, image_3,
              image_4, image_5, "Processing"])
 
     return [True, "Request Sent"]
@@ -162,7 +162,7 @@ def accept_item(id):
             (seller_id, title, short_description, description, price, category, image_1, image_2, image_3, image_4, 
             image_5, available_quantity, stripe_prod_id, stripe_price_id)
              VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s)""",
-                           [prod.seller_uid, prod.title, prod.short_description,
+                           [prod.seller_id, prod.title, prod.short_description,
                             prod.description, prod.price, prod.category, prod.image_1, prod.image_2,
                             prod.image_3, prod.image_4, prod.image_5, stripe_prod["id"], stripe_price["id"]])
     with connection.cursor() as cursor:
@@ -285,7 +285,7 @@ def failed_un_reserve(id):
 def __prod_req_to_dict(prod):
     return {
         'req_id': str(prod.id),
-        'seller_uid': str(prod.seller_uid),
+        'seller_id': str(prod.seller_id),
         'category': str(prod.category),
         'image_1': prod.image_1,
         'image_2': prod.image_2,
@@ -312,6 +312,6 @@ def __prod_to_dict(prod):
         'description': prod.description,
         'price': prod.price,
         'price_id': str(prod.stripe_price_id),
-        'seller_id': str(prod.seller_uid),
+        'seller_id': str(prod.seller_id),
         'inventory': str(prod.available_quantity)
     }

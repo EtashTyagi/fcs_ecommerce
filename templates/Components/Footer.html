@@ -1,22 +1,22 @@
 {% load static %}
-<nav class="shadow-sm navbar navbar-dark bg-dark">
+<nav class="shadow-sm navbar navbar-dark bg-dark" style="z-index: 2">
   <div class="w-100">
     <div class="d-flex flex-column">
       <span class="text-success ms-2">© FCS Group, 2021</span>
       <rect class="mt-2 w-100 bg-warning" style="height: 1px"></rect>
       <ul class="mt-2 mx-2 navbar-nav d-flex flex-row justify-content-around flex-wrap">
         <li class="nav-item text-center" style="min-width: 150px">
-          <a class="nav-link  {% if active == "Home" %}active{% endif %}" aria-current="page" href="/">Home</a>
+          <a class="nav-link  {% if active == "Home" %}active{% endif %}" aria-current="page" href="{% url "home" %}">Home</a>
         </li>
         <li class="nav-item text-center" style="min-width: 150px">
-          <a class="nav-link {% if active == "Store" %}active{% endif %}" href="/store">Store</a>
+          <a class="nav-link {% if active == "Store" %}active{% endif %}" href="{% url "store" %}">Store</a>
         </li>
         <li class="nav-item text-center" style="min-width: 150px">
-          <a class="nav-link {% if active == "Sell" %}active{% endif %}" href="/sell">Sell</a>
+          <a class="nav-link {% if active == "Sell" %}active{% endif %}" href="{% url "sell" %}">Sell</a>
         </li>
         {% if not user.is_authenticated %}
           <li class="nav-item text-center" style="min-width: 150px">
-              <a class="nav-link {% if active == "Login" %}active{% endif %}" href="/login">Login</a>
+              <a class="nav-link {% if active == "Login" %}active{% endif %}" href="{% url "login" %}">Login</a>
           </li>
         {% endif %}
             <li class="nav-item text-center" style="min-width: 150px">

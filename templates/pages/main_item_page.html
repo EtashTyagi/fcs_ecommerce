@@ -68,7 +68,7 @@
                             <span style="font-size: 18px; font-weight: lighter">₹</span>
                         </div>
                         <div class="card-footer d-flex flex-row align-items-center w-100" style="max-height: 36px; overflow: hidden">
-                            <small class="text-muted"><b>Seller ID: </b></small><small class="ms-1"><a href="/profile/?id={{ item.seller_id }}">{{ item.seller_id }}</a></small>
+                            <small class="text-muted"><b>Seller ID: </b></small><small class="ms-1"><a href="{% url "profile" %}?id={{ item.seller_id }}">{{ item.seller_id }}</a></small>
                         </div>
                     </div>
                     <form class="w-100 d-flex flex-row justify-content-around flex-md-column" method="post">

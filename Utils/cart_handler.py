@@ -1,6 +1,7 @@
 # TODO: CHECK IF ITEMS ARE IN STOCK, SHOW NUMBER OF ITEMS IN STOCK
 from django.db import connection
 
+from cart.models import Cart
 from payment_gateway.models import Transaction
 from store.models import Product
 
@@ -23,8 +24,9 @@ def fetchCart(user):
 
 
 def is_in_cart(user, productID):
-    for _ in Product.objects.raw(
-            'SELECT 1 temp_id FROM cart_cart WHERE user_id=%s AND item_id=%s',
+    print(user, productID)
+    for _ in Cart.objects.raw(
+            'SELECT * FROM cart_cart WHERE user_id=%s AND item_id=%s',
             [user.id, productID]):
         return True
     return False

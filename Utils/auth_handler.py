@@ -163,7 +163,7 @@ def validate_password(password, password_conf):
         return [False, "Password Too Small"]
     elif len(password) > 32:
         return [False, "Password Too Long"]
-    elif Common_Passwords.objects.exists(password=password):
+    elif Common_Passwords.objects.filter(password=password).exists():
         return [False, "Password Too Common"]
 
     return [True, None]
@@ -253,7 +253,7 @@ def get_all_seller_requests_using(user):
                 'SELECT id, buyer_id, message FROM sell_seller_request WHERE LOWER(message)=%s', ["processing"]):
             pending.append({
                 "req_id": str(req.id),
-                "buyer_id": str(req.buyer.id),
+                "buyer_id": str(req.buyer_id),
                 "message": req.message
             })
     elif is_admin(user):
@@ -262,7 +262,7 @@ def get_all_seller_requests_using(user):
                 ["processing", user.id]):
             pending.append({
                 "req_id": str(req.id),
-                "buyer_id": str(req.buyer.id),
+                "buyer_id": str(req.buyer_id),
                 "message": req.message
             })
     return pending
@@ -271,8 +271,11 @@ def get_all_seller_requests_using(user):
 def accept_seller_request(req_id):
     for req in Seller_Request.objects.raw(
             'SELECT id, buyer_id, message FROM sell_seller_request WHERE id=%s', [req_id]):
-        make_seller(User.objects.get(id=req.buyer.id))
-        delete_request_pdf_file(req.buyer.id)
+        make_seller(User.objects.get(id=req.buyer_id))
+        try:
+            delete_request_pdf_file(req.buyer_id)
+        except Exception as ignore:
+            print(ignore)
         break
     with connection.cursor() as cursor:
         cursor.execute("""DELETE FROM sell_seller_request WHERE id=%s""", [req_id])
@@ -281,7 +284,10 @@ def accept_seller_request(req_id):
 def reject_seller_request(req_id, message):
     for req in Seller_Request.objects.raw(
             'SELECT id, buyer_id, message FROM sell_seller_request WHERE id=%s', [req_id]):
-        delete_request_pdf_file(req.buyer.id)
+        try:
+            delete_request_pdf_file(req.buyer_id)
+        except Exception as ignore:
+            print(ignore)
         break
     with connection.cursor() as cursor:
         cursor.execute("""UPDATE sell_seller_request SET message=%s WHERE id=%s""", [message, req_id])

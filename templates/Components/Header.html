@@ -1,7 +1,7 @@
 {% load static %}
-<nav class="shadow-sm navbar navbar-expand-md navbar-dark bg-dark">
+<nav class="shadow-sm navbar navbar-expand-md navbar-dark bg-dark" style="z-index: 2">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/">
+    <a class="navbar-brand" href={% url "home" %}>
         <div class="d-flex align-items-center justify-content-center">
             <img alt="company Logo" class="rounded-circle" height="32px" src="{% static 'res/logo.jpg' %}">
             <span class="h-100 ms-1" style="font-weight: 600">FCS</span>
@@ -13,13 +13,13 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-md-0">
       <li class="nav-item">
-          <a  class="nav-link {% if active == 'Home' %}active{% endif %}" aria-current="page" href="/">Home</a>
+          <a  class="nav-link {% if active == 'Home' %}active{% endif %}" aria-current="page" href={% url "home" %}>Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if active == 'Store' %}active{% endif %}" href="/store">Store</a>
+          <a class="nav-link {% if active == 'Store' %}active{% endif %}" href={% url "store" %}>Store</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if active == 'Sell' %}active{% endif %}" href="/sell">Sell</a>
+          <a class="nav-link {% if active == 'Sell' %}active{% endif %}" href={% url "sell" %}>Sell</a>
         </li>
       </ul>
         {% if active == "Home" or active == "Store" or active == "Item"%}
@@ -47,9 +47,9 @@
                                   .then(response => response.json())
                                   .then(data => {
                                     document.getElementById("search_filler").innerHTML =
-                                        `<li><a class="dropdown-item" href="/store/?q=${state.value}&c=${strUser}"><img class="me-2" style="height: 24px; width: 24px; object-fit: contain" src="{% static 'res/search_icon.svg' %}">${state.value}</div></a></li>`+
+                                        `<li><a class="dropdown-item" href="{% url "home" %}?q=${state.value}&c=${strUser}"><img class="me-2" style="height: 24px; width: 24px; object-fit: contain" src="{% static 'res/search_icon.svg' %}">${state.value}</div></a></li>`+
                                             "\n"+
-                                        (data.data.map(element => `<li><a class="dropdown-item" href="/item/?id=${element.ID}"><img class="me-1" style="height: 24px; width: 24px; object-fit: contain" src="${element.image}"> ${element.title}</div></a></li>`).join('\n'));
+                                        (data.data.map(element => `<li><a class="dropdown-item" href="{% url "item" %}?id=${element.ID}"><img class="me-1" style="height: 24px; width: 24px; object-fit: contain" src="${element.image}"> ${element.title}</div></a></li>`).join('\n'));
                                     resolve(data.data)
                                   })
                                 })
@@ -60,7 +60,6 @@
                                   fetch(url)
                                   .then(response => response.json())
                                   .then(data => {
-                                      console.log(data)
                                     document.getElementById("catdd").innerHTML =
                                         `<option value="">All</option>`+
                                             "\n"+
@@ -83,16 +82,16 @@
             </a>
         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-md-end" aria-labelledby="login">
             {% if not user.is_authenticated %}
-                <li><a class="dropdown-item" href="/login">Login</a></li>
-                <li><a class="dropdown-item" href="/signup">Signup</a></li>
+                <li><a class="dropdown-item" href="{% url "login" %}">Login</a></li>
+                <li><a class="dropdown-item" href="{% url "signup" %}">Signup</a></li>
             {% else %}
-                <li><a class="dropdown-item" href="/profile/?id={{ user.id }}">Profile</a></li>
-                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                <li><a class="dropdown-item" href="{% url "profile" %}?id={{ user.id }}">Profile</a></li>
+                <li><a class="dropdown-item" href="{% url "logout" %}">Logout</a></li>
             {% endif %}
         </ul>
         </div>
         <div class="nav-item dropdown pt-2 pt-md-0 ms-1">
-            <a class="btn {% if active == 'Cart'%}btn-outline-success{% endif %}" href="/cart" role="button" aria-expanded="false">
+            <a class="btn {% if active == 'Cart'%}btn-outline-success{% endif %}" href="{% url "cart" %}" role="button" aria-expanded="false">
                     <img class="rounded-circle" height="28px" src="/static/res/cartIcon.png" alt="Cart"/>
             </a>
         </div>

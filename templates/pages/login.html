@@ -301,7 +301,7 @@ window.addEventListener("DOMContentLoaded", function () {
                 <input type="checkbox" name="signed_in" value="signed_in">
                 <span style="font-size: 12px">Remember Me</span>
             </label>
-            <div class="d-flex flex-column align-items-center mt-2 w-100" href="/">
+            <div class="d-flex flex-column align-items-center mt-2 w-100" href="{% url "home" %}">
                 <label style="max-width: 75%">
                     <button class="btn btn-success" style=" width: 125px; max-width: 100%;" type="submit" data-bs-toggle="modal" data-bs-target="#modal_login" id="modal_button_login">
                         Log In
@@ -321,7 +321,7 @@ window.addEventListener("DOMContentLoaded", function () {
                 </div>
 
                 <label class="my-2" style="max-width: 75%">
-                    <a  href="/signup" style="text-decoration: none"><button class="btn btn-primary" style=" width: 125px; max-width: 100%;" type="button">Sign Up
+                    <a  href="{% url "signup" %}" style="text-decoration: none"><button class="btn btn-primary" style=" width: 125px; max-width: 100%;" type="button">Sign Up
                     </button></a>
 
                 </label>

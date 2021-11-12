@@ -40,9 +40,9 @@
                       {% for purchase in purchases %}
                       <tr>
                           <td>{{ purchase.Sno }}</td>
-                          <td>{% if purchase.Buyer %}<a href="/profile/?id={{ purchase.Buyer  }}">{{ purchase.Buyer }}</a>{% else %}Removed{% endif %}</td>
-                          <td>{% if purchase.Seller %}<a href="/profile/?id={{ purchase.Seller }}">{{ purchase.Seller }}</a>{% else %}Removed{% endif %}</td>
-                          <td>{% if purchase.Item %}<a href="/item/?id={{ purchase.Item }}">{{ purchase.Item }}</a>{% else %}Removed{% endif %}</td>
+                          <td>{% if purchase.Buyer %}<a href="{% url "profile" %}?id={{ purchase.Buyer  }}">{{ purchase.Buyer }}</a>{% else %}Removed{% endif %}</td>
+                          <td>{% if purchase.Seller %}<a href="{% url "profile" %}?id={{ purchase.Seller }}">{{ purchase.Seller }}</a>{% else %}Removed{% endif %}</td>
+                          <td>{% if purchase.Item %}<a href="{% url "profile" %}?id={{ purchase.Item }}">{{ purchase.Item }}</a>{% else %}Removed{% endif %}</td>
                           <td>{{ purchase.Price }}</td>
                           <td>{{ purchase.status }}</td>
                       </tr>
