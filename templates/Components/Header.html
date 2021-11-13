@@ -47,7 +47,7 @@
                                   .then(response => response.json())
                                   .then(data => {
                                     document.getElementById("search_filler").innerHTML =
-                                        `<li><a class="dropdown-item" href="{% url "home" %}?q=${state.value}&c=${strUser}"><img class="me-2" style="height: 24px; width: 24px; object-fit: contain" src="{% static 'res/search_icon.svg' %}">${state.value}</div></a></li>`+
+                                        `<li><a class="dropdown-item" href="{% url "home" %}?q=${state.value}&c=${strUser}"><img class="me-2" style="height: 24px; width: 24px; object-fit: contain" src="{% static 'res/search_icon.svg' %}">${state.value.toLocaleString().replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div></a></li>`+
                                             "\n"+
                                         (data.data.map(element => `<li><a class="dropdown-item" href="{% url "item" %}?id=${element.ID}"><img class="me-1" style="height: 24px; width: 24px; object-fit: contain" src="${element.image}"> ${element.title}</div></a></li>`).join('\n'));
                                     resolve(data.data)
