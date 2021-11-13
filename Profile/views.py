@@ -70,7 +70,6 @@ def admin_response_to_new_item_request_GUI(request):
             args = {"requests": req_items, "keys": list(req_items[0].keys()) if len(req_items) != 0 else []}
             return render(request, 'pages/admin_response_to_new_item_request.html', args)
         elif request.method == "POST":
-            print(request.POST)
             if "response_accept" in request.POST == "response_decline" in request.POST:
                 return HttpResponse("<h1>Error</h1><p>Bad Request</p>")
             elif "response_accept" in request.POST and prod_request_exists(request.POST["response_accept"]):
@@ -96,7 +95,6 @@ def admin_response_to_seller_request_GUI(request):
             args = {"requests": req_items, "keys": list(req_items[0].keys()) if len(req_items) != 0 else []}
             return render(request, 'pages/admin_response_to_seller_request.html', args)
         elif request.method == "POST":
-            print(request.POST)
             if "download" in request.POST:
                 return download_request_pdf_file(request.POST["download"])
             if "response_accept" in request.POST == "response_decline" in request.POST:
