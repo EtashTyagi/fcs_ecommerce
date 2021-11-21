@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--pyusjbuve0rh^&*9j-nd)l55sw67l$@^hfy-!1c7zz--ol7s&'
+SECRET_KEY = 'key'      # Retracted
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -143,8 +143,8 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-STRIPE_PUBLIC_KEY = "pk_test_51JkPoKSBGHFum3RMzBSmkN39OdabCvtmEhxl979BGkFj9QKzpWyI9K91YTJSWEKqr7RrzBPLJGkolDqA85S98Ix4008pzSzFJg"
-STRIPE_SECRET_KEY = "sk_test_51JkPoKSBGHFum3RMJIqC2NVQfSNoZK3vpFTvvZSyE9S3R67RURuC1DWTobnGGzFQEKzOulG89pMhuwg6wLxfb6LM00eGwcEEjO"
+STRIPE_PUBLIC_KEY = "enter_key"    # Retracted
+STRIPE_SECRET_KEY = "enter_key"    # Retracted
 STRIPE_WEBHOOK_SECRET = ""
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -165,8 +165,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = socket.gethostbyname('smtp.gmail.com')
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'fcs.group30@gmail.com'
-EMAIL_HOST_PASSWORD = 'fcs@group#3030'
-
+EMAIL_HOST_USER = 'name@domain.com'  # Retracted
+EMAIL_HOST_PASSWORD = 'password'     # Retracted
 
 
