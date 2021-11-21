@@ -2,9 +2,12 @@
 - <b>Database:</b> MySQL
 - <b>Database Name:</b> fcs_ecommerce
 - <b>Before Run:</b>
+  - python -m pip install -r requirements.txt
   - Start MySQL
   - In Main -> settings.py, fill in retracted fields
   - In Main -> settings.py, change MySQL username and password
+  - python manage.py makemigrations
+  - python manage.py migrate
 - <b>Environment variables:</b> PYTHONUNBUFFERED=1;DJANGO_SETTINGS_MODULE=Main.settings
-- <b>Run From Command Line:</b> python3 manage.py runserver 0.0.0.0:443
+- <b>Run From Command Line:</b> python manage.py runserver 0.0.0.0:443
 - Update ALLOWED_HOSTS and DEBUG in settings.py as desired.
