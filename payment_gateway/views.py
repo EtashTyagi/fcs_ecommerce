@@ -51,7 +51,7 @@ class CreateCheckoutSessionView(View):
             request.session.pop("otp_payment_success")
             item = fetchFullItem(request.session["payment_item_id"])
             request.session.pop("payment_item_id")
-            YOUR_DOMAIN = "https://192.168.3.51"  # change in production
+            YOUR_DOMAIN = "http://127.0.0.1"  # change in production
             if not request.user.is_authenticated:
                 return redirect(all_urls["login"])
             elif not (is_buyer(request.user) or is_seller(request.user) or is_admin(request.user)):
@@ -87,15 +87,13 @@ class SuccessView(TemplateView):
     template_name = "pages/success.html"
 
     def post(self, request, *args, **kwargs):
-        if "checking_out" in request.session:
-            succeed_transaction(request.session["checking_out"])
-            request.session.pop("checking_out")
-            return render(request, template_name=self.template_name)
-        else:
-            return HttpResponse("Invalid Request")
+        self.get(request, args, kwargs)
 
     def get(self, request, *args, **kwargs):
         if "checking_out" in request.session:
+            session = stripe.checkout.Session.retrieve(request.session["checking_out"])
+            if session["payment_status"] == "unpaid":
+                return HttpResponse("Please Pay For The Item")
             succeed_transaction(request.session["checking_out"])
             request.session.pop("checking_out")
             return render(request, template_name=self.template_name)

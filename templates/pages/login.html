@@ -34,7 +34,7 @@
             {{ message }}
         </span>
         {% endif %}
-        <form class="mt-2 d-flex flex-column align-items-center w-100" method="post">
+        <form class="mt-2 d-flex flex-column align-items-center w-100" method="post" id="login_form">
             {% csrf_token %}
             <label class="w-100 d-flex align-items-center justify-content-center">
                 <input type="text" name="username" id="username" placeholder="Username" minlength="4" maxlength="32" style="min-width: 69%" required>
@@ -43,6 +43,7 @@
                 <input class="use-keyboard-input" type="password" name="password" id="password" placeholder="Password" minlength="8" maxlength="32" style=" min-width:69%" required>
                 <style>
                     .keyboard {
+                        z-index: 5;
     position: fixed;
     left: 0;
     bottom: 0;
@@ -303,7 +304,7 @@ window.addEventListener("DOMContentLoaded", function () {
             </label>
             <div class="d-flex flex-column align-items-center mt-2 w-100" href="{% url "home" %}">
                 <label style="max-width: 75%">
-                    <button class="btn btn-success" style=" width: 125px; max-width: 100%;" type="submit" data-bs-toggle="modal" data-bs-target="#modal_login" id="modal_button_login">
+                    <button class="btn btn-success" style=" width: 125px; max-width: 100%;" type="submit">
                         Log In
                     </button>
                 </label>
@@ -319,7 +320,12 @@ window.addEventListener("DOMContentLoaded", function () {
                             </div>
                         </div>
                 </div>
-
+                <script>
+                    let modal = document.getElementById("modal_login");
+                    document.getElementById("login_form").addEventListener("submit", function (e) {
+                        new bootstrap.Modal(modal, {}).show()
+                    });
+                </script>
                 <label class="my-2" style="max-width: 75%">
                     <a  href="{% url "signup" %}" style="text-decoration: none"><button class="btn btn-primary" style=" width: 125px; max-width: 100%;" type="button">Sign Up
                     </button></a>

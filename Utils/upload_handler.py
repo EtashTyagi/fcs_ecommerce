@@ -1,4 +1,3 @@
-# TODO: FILE VALIDATION, ALSO CHECK IF FILE ALREADY EXISTS
 import errno
 import os
 from django.conf import settings

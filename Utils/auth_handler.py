@@ -43,7 +43,6 @@ def create_user(request):
 
 # -----------------------------------------------------------------------------------------------------------
 
-# TODO: change the below link at time of production
 
 def send_mail_after_registration(email, token):
     subject = 'Please Verify Your Account'
@@ -141,7 +140,7 @@ def validate_signup(username, first_name, last_name, email, password, conf_passw
 
 def validate_name(name):
     isAlpha = name.isalpha()
-    return [isAlpha, None if isAlpha else "Username Taken"]
+    return [isAlpha, None if isAlpha else "Name Can't have letters"]
 
 
 def validate_email(email):

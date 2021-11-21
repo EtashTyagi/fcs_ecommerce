@@ -20,17 +20,34 @@
         {% endblock header %}
     </header>
     <body >
-        <div style="min-height: calc(100vh - 160px); background: antiquewhite;" class="d-flex flex-column align-items-center">
-            <div class="d-flex flex-wrap mx-2 my-3 justify-content-center card align-items-center bg-light flex-row" style="width: 90%; max-width: 1125px">
-            <span class="h1 w-100 text-center text-white-75 card-header" style="background:linear-gradient(45deg, rgba(200, 200, 200,0.5), rgba(210,210,210, 0.5))">{% if q == "" and c == "" %}Welcome To Store!{% elif q == "" %}Category: {{ c }}{% elif c == "" %}Search Results For "{{ q }}"{% else %}
+        <style>
+            .btn-outline-light-success:hover{
+                background: rgb(255,255,255);
+                background: linear-gradient(-45deg, rgba(255, 125, 125, 0.5), rgba(150,150,255, 0.5));
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+            }
+            @media only screen and (max-width: 820px) {
+                #main_cont {
+                    max-width: 380px !important;
+                }
+            }
+            @media only screen and (max-width: 1250px) and (min-width: 820px) {
+                #main_cont {
+                    max-width: 735px !important;
+                }
+            }
+        .custom_bg{
+background-color: #CA0000;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 1600 800'%3E%3Cg %3E%3Cpolygon fill='%23d51632' points='1600 160 0 460 0 350 1600 50'/%3E%3Cpolygon fill='%23df2b65' points='1600 260 0 560 0 450 1600 150'/%3E%3Cpolygon fill='%23ea4197' points='1600 360 0 660 0 550 1600 250'/%3E%3Cpolygon fill='%23f456ca' points='1600 460 0 760 0 650 1600 350'/%3E%3Cpolygon fill='%23FF6CFC' points='1600 800 0 800 0 750 1600 450'/%3E%3C/g%3E%3C/svg%3E");
+background-attachment: fixed;
+background-size: cover;
+        }
+        </style>
+        <div style="min-height: calc(100vh - 160px)" class="d-flex flex-column align-items-center custom_bg">
+            <div class="d-flex flex-wrap mx-2 my-3 justify-content-center card align-items-center bg-light flex-row shadow-sm" style="width: 90%; max-width: 1125px" id="main_cont">
+            <span class="h1 w-100 text-center text-white-75 card-header shadow-sm" style="background:linear-gradient(45deg, rgba(200, 200, 200,0.5), rgba(210,210,210, 0.5))">{% if q == "" and c == "" %}Welcome To Store!{% elif q == "" %}Category: {{ c }}{% elif c == "" %}Search Results For "{{ q }}"{% else %}
             Search Results For "{{ q }}" In Category: "{{ c }}"
         {% endif %}</span>
-            <style>
-                .btn-outline-light-success:hover{
-                    background: rgb(255,255,255);
-background: linear-gradient(-45deg, rgba(255, 125, 125, 0.4), rgba(150,150,255, 0.4), rgba(255, 125, 125, 0.4));
-                }
-            </style>
             {% if items.len == 0 %}
                 <span class="h2 text-danger">No Items Found!</span>
             {% else %}

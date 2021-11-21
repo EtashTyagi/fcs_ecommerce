@@ -24,8 +24,8 @@
      style="background: antiquewhite; min-height:calc(100vh - 156px)">
         <div class="d-flex flex-column align-items-center justify-content-center pb-3 my-2 mt-4" style="width:90%; max-width: 1250px">
             <span class="text-black fw-bold h1 w-100 text-start mb-2">Your Sales</span>
-            <div class="table-responsive w-100">
-                <table class="table table-hover table-bordered table-light">
+            <div class="table-responsive w-100 rounded-3 shadow-sm">
+                <table class="table table-hover table-bordered table-light pb-0 mb-0">
                     <thead class="table-dark">
                       <tr>
                           <th scope="col">ID</th>
@@ -42,7 +42,7 @@
                           <td>{{ sale.Sno }}</td>
                         <td>{% if sale.Seller %}<a href="{% url "profile" %}?id={{ sale.Seller }}">{{ sale.Seller }}</a>{% else %}Removed{% endif %}</td>
                           <td>{% if sale.Buyer %}<a href="{% url "profile" %}?id={{ sale.Buyer  }}">{{ sale.Buyer }}</a>{% else %}Removed{% endif %}</td>
-                          <td>{% if sale.Item %}<a href="{% url "profile" %}?id={{ sale.Item }}">{{ sale.Item }}</a>{% else %}Removed{% endif %}</td>
+                          <td>{% if sale.Item %}<a href="{% url "item" %}?id={{ sale.Item }}">{{ sale.Item }}</a>{% else %}Removed{% endif %}</td>
                           <td>{{ sale.Price }}</td>
                           <td>{{ sale.status }}</td>
                       </tr>

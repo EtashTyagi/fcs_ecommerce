@@ -1,7 +1,6 @@
-# TODO: Number of available items, use in cart and while displaying on main tab
 # IMPORTANT: PLEASE DO NOT USE FORMAT STRING IN RAW SQL QUERIES, IT WILL CAUSE SQL INJECTIONS:
 # https://docs.djangoproject.com/en/3.2/topics/db/sql/
-from django.db import connection
+from django.db import connection, DataError
 
 from Utils.auth_handler import is_admin
 from payment_gateway.models import Transaction
@@ -109,6 +108,16 @@ def insert_new_item_request(request):
     description = request.POST["description"]
     price = request.POST["price"]
 
+    try:
+        temp_price = float(price)
+        if temp_price <= 0:
+            return [False, "Invalid Price"]
+    except ValueError:
+        return [False, "Invalid Price"]
+
+    if description.lower().find("<script") != -1 or description.lower().find("</script>") != -1:
+        return [False, "Script Tag Not Allowed!"]
+
     image_1 = request.POST["image_1"]
     image_2 = request.POST["image_2"]
     image_3 = request.POST["image_3"] if "image_3" in request.POST else None
@@ -121,13 +130,16 @@ def insert_new_item_request(request):
 
     if len(prev) > 9:
         return [False, "Delete requests or wait for approval"]
-    with connection.cursor() as cursor:
-        cursor.execute(
-            """INSERT INTO sell_new_product_request(seller_id, title, short_description, description, price, category, 
-            image_1, image_2, image_3, image_4, image_5, message) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-            [seller_id, title, short_description, description, price, prod_type, image_1, image_2, image_3,
-             image_4, image_5, "Processing"])
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """INSERT INTO sell_new_product_request(seller_id, title, short_description, description, price, category, 
+                image_1, image_2, image_3, image_4, image_5, message) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                [seller_id, title, short_description, description, price, prod_type, image_1, image_2, image_3,
+                 image_4, image_5, "Processing"])
+    except DataError:
+        return [False, "Invalid Input"]
 
     return [True, "Request Sent"]
 

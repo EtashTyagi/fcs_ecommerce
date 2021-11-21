@@ -22,16 +22,16 @@
 <body >
 <div class="d-flex align-items-center flex-column"
      style="background: antiquewhite; min-height:calc(100vh - 156px)">
-        <form class="d-flex flex-column align-items-center mt-4 card pb-3 my-2 mx-2 mt-4" style="max-width: 1000px; width: 90%" method="post" enctype="multipart/form-data">
-            <span class="text-black fw-bold h1 card-title card-header w-100 text-start">Sell New Item</span>
+        <form class="d-flex flex-column align-items-center mt-4 card shadow-sm pb-3 my-2 mx-2 mt-4" style="max-width: 1000px; width: 90%" method="post" enctype="multipart/form-data">
+            <span class="shadow-sm text-black fw-bold h1 card-title card-header w-100 text-start">Sell New Item</span>
                 {% csrf_token %}
                 <span class="{% if success %}text-black{% else %}text-danger{% endif %} fw-bold h2 text-center mt-2">{{ message }}</span>
             <label class="d-flex mt-1 flex-row mx-2" style="width: 90%">
                 <label class="w-50 me-1">
-                    <input id="title" class="w-100" name="title" type="text" placeholder="Product Name" required>
+                    <input id="title" class="w-100" name="title" type="text" placeholder="Product Name" required maxlength="25">
                 </label>
                 <label class="w-50 ms-1">
-                    <input id="title" class="w-100" name="prod_type" type="text" placeholder="Product Type" required>
+                    <input id="title" class="w-100" name="prod_type" type="text" placeholder="Product Type" required maxlength="15">
                 </label>
             </label>
             <label class="d-flex mt-3 mx-2" style="width: 90%">
@@ -55,11 +55,11 @@
                                                  if (this.value < this.min) this.value = this.min;" required>
             </label>
                 <label class="d-flex mt-3 mx-2 align-items-center justify-content-center flex-row flex-wrap" style="width: 90%">
-                    <input id="title" class="w-50" name="image_1" type="text" placeholder="Google Drive image 1" required>
-                    <input id="title" class="w-50" name="image_2" type="text" placeholder="Google Drive image 2" required>
-                    <input id="title" class="w-50" name="image_3" type="text" placeholder="Google Drive image 3 (Optional)">
-                    <input id="title" class="w-50" name="image_4" type="text" placeholder="Google Drive image 4 (Optional)">
-                    <input id="title" class="w-50" name="image_5" type="text" placeholder="Google Drive image 5 (Optional)">
+                    <input id="title" class="w-50" name="image_1" type="text" placeholder="Google Drive image 1" maxlength="1000" required>
+                    <input id="title" class="w-50" name="image_2" type="text" placeholder="Google Drive image 2" maxlength="1000" required>
+                    <input id="title" class="w-50" name="image_3" type="text" placeholder="Google Drive image 3 (Optional)" maxlength="1000">
+                    <input id="title" class="w-50" name="image_4" type="text" placeholder="Google Drive image 4 (Optional)" maxlength="1000">
+                    <input id="title" class="w-50" name="image_5" type="text" placeholder="Google Drive image 5 (Optional)" maxlength="1000">
                 </label>
                 <label class="mt-4 d-flex align-items-center justify-content-center" style="width: 90%">
                     <button style="max-width: 400px" class="btn btn-success w-100 mb-2" type="submit" name="product_request">Send Request

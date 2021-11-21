@@ -22,10 +22,10 @@
 <body >
 <div class="d-flex align-items-center flex-column"
      style="background: antiquewhite; min-height:calc(100vh - 156px)">
-        <div class="d-flex flex-column align-items-center justify-content-center card pb-3 my-2 mt-4" style="width:90%; max-width: 1000px">
-            <span class="text-black fw-bold h1 card-title card-header w-100 text-start mb-2">Pending/Rejected Items</span>
+        <div class="d-flex flex-column align-items-center justify-content-center card pb-3 my-2 mt-4 shadow-sm" style="width:90%; max-width: 1000px">
+            <span class="shadow-sm text-black fw-bold h1 card-title card-header w-100 text-start mb-2">Pending/Rejected Items</span>
             {% for request in requests %}
-                <form class="my-1 card" style="width: 90%; max-width: 1000px" method="post">
+                <form class="my-1 card shadow-sm" style="width: 90%; max-width: 1000px" method="post">
                 {% csrf_token %}
                     <div class="card-body">
                         {% for k, v in request.items %}

@@ -73,6 +73,7 @@
             </label>
             <style>
                     .keyboard {
+                        z-index: 5;
     position: fixed;
     left: 0;
     bottom: 0;
@@ -338,7 +339,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
             <div class="d-flex flex-column align-items-center mt-4 w-100" >
                 <label style="max-width: 75%">
-                    <button class="btn btn-success" style="height: 45px;width: 125px; max-width: 100%;" type="submit" data-bs-toggle="modal" data-bs-target="#modal_signup" id="modal_button_signup">
+                    <button class="btn btn-success" style="height: 45px;width: 125px; max-width: 100%;" type="submit">
                         Continue
                     </button>
                     </label>
@@ -354,9 +355,14 @@ window.addEventListener("DOMContentLoaded", function () {
                             </div>
                         </div>
                 </div>
-
             </div>
         </form>
+        <script>
+            let modal = document.getElementById("modal_signup");
+            document.getElementById("signup_form").addEventListener("submit", function (e) {
+                new bootstrap.Modal(modal, {}).show()
+            });
+        </script>
     </div>
 </div>
 
