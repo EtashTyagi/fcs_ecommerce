@@ -15,7 +15,7 @@ class New_Product_Request(models.Model):
     image_3 = models.CharField(max_length=1000, blank=True, null=True)
     image_4 = models.CharField(max_length=1000, blank=True, null=True)
     image_5 = models.CharField(max_length=1000, blank=True, null=True)
-    category = models.CharField(max_length=100)
+    category = models.CharField(max_length=15)
     message = models.CharField(max_length=2000)
 
     def __str__(self):

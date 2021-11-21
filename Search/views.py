@@ -15,8 +15,6 @@ from Utils.item_handler import *
 """
 
 
-# TODO: Track number of requests for a session, timeout if > N reqs/sec
-
 def search(request):
     MAX_RES = 10
     if request.method == "GET":

@@ -18,7 +18,6 @@ from Utils.item_handler import *
 """
 
 
-# TODO: Track number of requests for a session, timeout if > N reqs/sec
 
 def sell(request):
     request.session.pop('login_to_continue_to', None)

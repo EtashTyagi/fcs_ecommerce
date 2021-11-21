@@ -19,9 +19,6 @@ from Utils.upload_handler import download_request_pdf_file
 """
 
 
-# TODO: Track number of requests for a session, timeout if > N reqs/sec
-
-
 def profile(request):
     request.session.pop('login_to_continue_to', None)
     if request.method == "GET":

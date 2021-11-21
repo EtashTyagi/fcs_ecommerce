@@ -17,7 +17,7 @@ class Product(models.Model):
     image_4 = models.CharField(max_length=1000, blank=True, null=True)
     image_5 = models.CharField(max_length=1000, blank=True, null=True)
     available_quantity = models.IntegerField()
-    category = models.CharField(max_length=100)
+    category = models.CharField(max_length=15)
 
     def __str__(self):
         return self.title

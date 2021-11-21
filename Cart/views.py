@@ -16,7 +16,6 @@ from Utils.all_urls import all_urls
         6. When combined (POST and must be authed), handle auth inside the request type block !!
         7. After change to database using POST 'ALWAYS' redirect !!!
 """
-# TODO: Track number of requests for a session, timeout if > N reqs/sec
 
 
 def cart(request):

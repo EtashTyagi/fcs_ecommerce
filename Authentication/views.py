@@ -25,9 +25,6 @@ from .models import Unverified_User
 """
 
 
-# TODO: Track number of requests for a session, timeout if > N reqs/sec
-
-
 def login(request):
     args = {"green": False, "red": False}
     if request.user.is_authenticated:
