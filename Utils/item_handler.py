@@ -1,8 +1,10 @@
 # IMPORTANT: PLEASE DO NOT USE FORMAT STRING IN RAW SQL QUERIES, IT WILL CAUSE SQL INJECTIONS:
 # https://docs.djangoproject.com/en/3.2/topics/db/sql/
+from django.core.exceptions import ValidationError
 from django.db import connection, DataError
 
 from Utils.auth_handler import is_admin
+from Utils.upload_handler import FileValidator, upload_prod_image_file, delete_prod_image_file
 from payment_gateway.models import Transaction
 from Main import settings
 from store.models import Product
@@ -33,7 +35,7 @@ def fetchItems(request, search_in=("title",), limit=float('inf')):
     category = ("" if "c" not in request.GET else request.GET["c"][:-1]
     if len(request.GET["c"]) > 0 and request.GET["c"][-1] == '/' else request.GET["c"]).lower()
     sh_item = lambda product: {'ID': str(prod.stripe_prod_id),
-                               'image': prod.image_1,
+                               'image': settings.STATIC_URL + prod.image_1,
                                'title': prod.title,
                                'short_description': prod.short_description,
                                'price': str(prod.price),
@@ -103,10 +105,12 @@ def fetchFullItem(id):
 
 def insert_new_item_request(request):
     seller_id = request.user.id
+    print(request.FILES)
     title = request.POST["title"]
     short_description = request.POST["short_description"]
     description = request.POST["description"]
     price = request.POST["price"]
+    prod_type = request.POST["prod_type"].lower()
 
     try:
         temp_price = float(price)
@@ -118,28 +122,76 @@ def insert_new_item_request(request):
     if description.lower().find("<script") != -1 or description.lower().find("</script>") != -1:
         return [False, "Script Tag Not Allowed!"]
 
-    image_1 = request.POST["image_1"]
-    image_2 = request.POST["image_2"]
-    image_3 = request.POST["image_3"] if "image_3" in request.POST else None
-    image_4 = request.POST["image_4"] if "image_4" in request.POST else None
-    image_5 = request.POST["image_5"] if "image_5" in request.POST else None
+    if "image_1" not in request.FILES or "image_2" not in request.FILES:
+        return [False, "Images Not Supplied"]
 
-    prod_type = request.POST["prod_type"].lower()
+    if New_Product_Request.objects.filter(seller_id=seller_id, title__iexact=title.lower()).exists():
+        return [False, f"Item '{title.lower()}' already requested by you!"]
+
+    if Product.objects.filter(seller_id=seller_id, title__iexact=title.lower()).exists():
+        return [False, f"Item '{title.lower()}' already listed by you!"]
 
     prev = fetch_item_request_for_user(request.user)
-
     if len(prev) > 9:
         return [False, "Delete requests or wait for approval"]
+
+    image_1 = request.FILES["image_1"]
+    image_2 = request.FILES["image_2"]
+    image_3 = request.FILES["image_3"] if "image_3" in request.FILES else None
+    image_4 = request.FILES["image_4"] if "image_4" in request.FILES else None
+    image_5 = request.FILES["image_5"] if "image_5" in request.FILES else None
+
+    validator = FileValidator(max_size=1024 * 1024, content_types=("image/png", "image/jpg", "image/gif"))
     try:
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """INSERT INTO sell_new_product_request(seller_id, title, short_description, description, price, category, 
-                image_1, image_2, image_3, image_4, image_5, message) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                [seller_id, title, short_description, description, price, prod_type, image_1, image_2, image_3,
-                 image_4, image_5, "Processing"])
-    except DataError:
-        return [False, "Invalid Input"]
+        validator(image_1)
+        fp_1 = upload_prod_image_file(image_1, title)
+        validator(image_2)
+        fp_2 = upload_prod_image_file(image_2, title)
+        fp_3 = None
+        fp_4 = None
+        fp_5 = None
+        if image_3:
+            validator(image_3)
+            fp_3 = upload_prod_image_file(image_3, title)
+        if image_4:
+            validator(image_4)
+            fp_4 = upload_prod_image_file(image_4, title)
+        if image_5:
+            validator(image_5)
+            fp_5 = upload_prod_image_file(image_5, title)
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """INSERT INTO sell_new_product_request(seller_id, title, short_description, description, price, category, 
+                    image_1, image_2, image_3, image_4, image_5, message) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                    [seller_id, title, short_description, description, price, prod_type, fp_1, fp_2, fp_3,
+                     fp_4, fp_5, "Processing"])
+        except DataError:
+            try:
+                delete_prod_image_file(fp_1)
+                delete_prod_image_file(fp_2)
+            except OSError:
+                pass
+                try:
+                    if image_3:
+                        delete_prod_image_file(fp_3)
+                except OSError:
+                    pass
+                try:
+                    if image_4:
+                        delete_prod_image_file(fp_4)
+                except OSError:
+                    pass
+                try:
+                    if image_5:
+                        delete_prod_image_file(fp_5)
+                except OSError:
+                    pass
+            return [False, "Invalid Input"]
+    except ValidationError as e:
+        return [False, e.message]
 
     return [True, "Request Sent"]
 
@@ -188,6 +240,28 @@ def reject_item(item_id, message):
 
 
 def delete_product(item_id, user):
+    prod = Product.objects.get(stripe_prod_id=item_id, seller_id=user.id)
+    try:
+        delete_prod_image_file(prod.image_1)
+        delete_prod_image_file(prod.image_2)
+    except OSError:
+        pass
+    try:
+        if prod.image_3 is not None:
+            delete_prod_image_file(prod.image_3)
+    except OSError:
+        pass
+    try:
+        if prod.image_4 is not None:
+            delete_prod_image_file(prod.image_4)
+    except OSError:
+        pass
+    try:
+        if prod.image_5 is not None:
+            delete_prod_image_file(prod.image_5)
+    except OSError:
+        pass
+
     with connection.cursor() as cursor:
         cursor.execute(
             """DELETE FROM store_product WHERE stripe_prod_id=%s AND seller_id=%s AND available_quantity=0""",
@@ -209,6 +283,28 @@ def update_inventory(to_add, user, item_id):
 
 
 def delete_request_item(req_id, user):
+    prod = New_Product_Request.objects.get(id=req_id, seller_id=user.id)
+    try:
+        delete_prod_image_file(prod.image_1)
+        delete_prod_image_file(prod.image_2)
+    except OSError:
+        pass
+    try:
+        if prod.image_3 is not None:
+            delete_prod_image_file(prod.image_3)
+    except OSError:
+        pass
+    try:
+        if prod.image_4 is not None:
+            delete_prod_image_file(prod.image_4)
+    except OSError:
+        pass
+    try:
+        if prod.image_5 is not None:
+            delete_prod_image_file(prod.image_5)
+    except OSError:
+        pass
+
     with connection.cursor() as cursor:
         cursor.execute("""DELETE FROM sell_new_product_request WHERE id=%s AND seller_id=%s""", [req_id, user.id])
     return True
@@ -299,11 +395,11 @@ def __prod_req_to_dict(prod):
         'req_id': str(prod.id),
         'seller_id': str(prod.seller_id),
         'category': str(prod.category),
-        'image_1': prod.image_1,
-        'image_2': prod.image_2,
-        'image_3': prod.image_3,
-        'image_4': prod.image_4,
-        'image_5': prod.image_5,
+        'image_1': settings.STATIC_URL + prod.image_1,
+        'image_2': settings.STATIC_URL + prod.image_2,
+        'image_3': settings.STATIC_URL + prod.image_3 if prod.image_3 is not None else None,
+        'image_4': settings.STATIC_URL + prod.image_4 if prod.image_4 is not None else None,
+        'image_5': settings.STATIC_URL + prod.image_5 if prod.image_5 is not None else None,
         'title': prod.title,
         'price': str(prod.price),
         'short_description': prod.short_description,
@@ -315,11 +411,11 @@ def __prod_req_to_dict(prod):
 def __prod_to_dict(prod):
     return {
         'ID': str(prod.stripe_prod_id),
-        'image_1': prod.image_1,
-        'image_2': prod.image_2,
-        'image_3': prod.image_3,
-        'image_4': prod.image_4,
-        'image_5': prod.image_5,
+        'image_1': settings.STATIC_URL + prod.image_1,
+        'image_2': settings.STATIC_URL + prod.image_2,
+        'image_3': settings.STATIC_URL + prod.image_3 if prod.image_3 is not None else None,
+        'image_4': settings.STATIC_URL + prod.image_4 if prod.image_4 is not None else None,
+        'image_5': settings.STATIC_URL + prod.image_5 if prod.image_5 is not None else None,
         'title': prod.title,
         'description': prod.description,
         'price': prod.price,

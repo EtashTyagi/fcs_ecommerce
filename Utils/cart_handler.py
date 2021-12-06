@@ -1,5 +1,6 @@
 from django.db import connection
 
+from Main import settings
 from cart.models import Cart
 from payment_gateway.models import Transaction
 from store.models import Product
@@ -14,7 +15,7 @@ def fetchCart(user):
             [user.id]):
         items.append({
             'ID': str(prod.stripe_prod_id),
-            'image': str(prod.image_1),
+            'image': settings.STATIC_URL + str(prod.image_1),
             'title': prod.title,
             'price': str(prod.price),
             'available_quantity': str(prod.available_quantity)

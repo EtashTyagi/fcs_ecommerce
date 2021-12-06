@@ -9,4 +9,4 @@ class LoggedInUser(models.Model):
     session_key = models.CharField(max_length=32, null=True, blank=True)
 
     def __str__(self):
-        return self.user
+        return self.session_key

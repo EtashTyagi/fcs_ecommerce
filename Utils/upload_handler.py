@@ -1,5 +1,8 @@
 import errno
 import os
+import random
+import string
+
 from django.conf import settings
 from django.http import HttpResponse, Http404
 import magic
@@ -29,7 +32,7 @@ class FileValidator(object):
                 'max_size': filesizeformat(self.max_size),
                 'size': filesizeformat(data.size),
             }
-            raise ValidationError(f"File should be < {self.max_size / 1024}kB.")
+            raise ValidationError(f"File should be < {self.max_size / 1024.0*1024.0}MB.")
 
         if self.min_size is not None and data.size < self.min_size:
             params = {
@@ -68,6 +71,22 @@ def upload_request_pdf_file(f, user_id):
             destination.write(chunk)
 
 
+def upload_prod_image_file(f, req_id):
+    identifier = str(req_id) + "/" + ''.join(random.choices(string.ascii_uppercase + string.digits, k=24)) + f.name[f.name.rfind("."):]
+    fp = settings.STATICFILES_DIRS[0] + "/" + identifier
+
+    if not os.path.exists(os.path.dirname(fp)):
+        try:
+            os.makedirs(os.path.dirname(fp))
+        except OSError as exc:  # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise OSError
+    with open(fp, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+    return identifier
+
+
 def download_request_pdf_file(user_id):
     file_path = settings.MEDIA_ROOT + "/" + str(user_id) + "/" + str(user_id) + ".pdf"
     if os.path.exists(file_path):
@@ -80,6 +99,17 @@ def download_request_pdf_file(user_id):
 
 def delete_request_pdf_file(user_id):
     fp = settings.MEDIA_ROOT + "/" + str(user_id) + "/" + str(user_id) + ".pdf"
+    if not os.path.exists(os.path.dirname(fp)):
+        try:
+            os.makedirs(os.path.dirname(fp))
+        except OSError as exc:  # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise OSError
+    os.remove(fp)
+
+
+def delete_prod_image_file(fp):
+    fp = settings.STATICFILES_DIRS[0] + "/" + fp
     if not os.path.exists(os.path.dirname(fp)):
         try:
             os.makedirs(os.path.dirname(fp))

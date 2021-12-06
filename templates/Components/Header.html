@@ -32,7 +32,7 @@
                         </select>
                         <input class="form-control dropdown dropdown-toggle rounded-0 border-0 w-100" style="cursor: text !important;" autocomplete="off" id="srch"
                                type="search" placeholder="Search" aria-label="Search" role="button" data-bs-toggle="dropdown" aria-expanded="false" oninput="get_search_results(this)"
-                        {% if active == "Home"%}value='{{ q }}'{% endif %} onmouseup="this.toggle()" name="q">
+                        {% if active == "Home"%}value='{{ q }}'{% endif %} name="q">
                         <ul class="dropdown-menu bg-gradient bg-light dropdown-menu-md-end w-100" aria-labelledby="searchbar" id="search_filler" style="cursor: pointer; overflow: hidden; text-overflow: ellipsis">
                             <li class="dropdown-item"><img class="me-2" src="{% static 'res/search_icon.svg' %}"></li>
                         </ul>
@@ -47,7 +47,7 @@
                                   .then(response => response.json())
                                   .then(data => {
                                     document.getElementById("search_filler").innerHTML =
-                                        `<li><a class="dropdown-item" href="{% url "home" %}?q=${state.value}&c=${strUser}"><img class="me-2" style="height: 24px; width: 24px; object-fit: contain" src="{% static 'res/search_icon.svg' %}">${state.value.toLocaleString().replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div></a></li>`+
+                                        `<li><a class="dropdown-item" href="{% url "home" %}?q=${state.value}&c=${strUser}"><img class="me-2" style="height: 24px; width: 24px; object-fit: contain" src="{% static 'res/search_icon.svg' %}">${state.value.toLocaleString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}</div></a></li>`+
                                             "\n"+
                                         (data.data.map(element => `<li><a class="dropdown-item" href="{% url "item" %}?id=${element.ID}"><img class="me-1" style="height: 24px; width: 24px; object-fit: contain" src="${element.image}"> ${element.title}</div></a></li>`).join('\n'));
                                     resolve(data.data)

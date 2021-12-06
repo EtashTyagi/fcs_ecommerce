@@ -155,7 +155,7 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024  # 1M
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 6  # 6M
 FILE_UPLOAD_MAX_MEMORY_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE
 
 CSRF_COOKIE_HTTPONLY = True
@@ -165,8 +165,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = socket.gethostbyname('smtp.gmail.com')
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = '-'   # Retracted - Your Mail
-EMAIL_HOST_PASSWORD = '-'      # Retracted - Your Password
+EMAIL_HOST_USER = '-'       # PLEASE FILL GMAIL ACCOUNT EMAIL ID
+EMAIL_HOST_PASSWORD = '-'   # PLEASE FILL GMAIL ACCOUNT PASSWORD
 
 
 
