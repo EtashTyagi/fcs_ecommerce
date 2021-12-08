@@ -40,3 +40,8 @@ uvicorn==0.13.4
 whitenoise==5.3.0
 wsproto==1.0.0
 zeroconf==0.28.8
+mysqlclient
+pyotp
+python-magic
+python-magic-bin
+stripe
