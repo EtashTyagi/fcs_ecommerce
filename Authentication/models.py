@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+
 User = settings.AUTH_USER_MODEL
 
 
@@ -9,7 +10,7 @@ class Unverified_User(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        return "token:" + self.auth_token + ", user:" + str(self.user_id)
 
 
 class Common_Passwords(models.Model):
@@ -24,4 +25,4 @@ class Phone_Number(models.Model):
     phone_number = models.CharField(max_length=10)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.phone_number}"

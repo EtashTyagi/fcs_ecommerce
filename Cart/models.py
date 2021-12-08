@@ -10,7 +10,7 @@ class Cart(models.Model):
     item = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return "user=" + str(self.user) + "; item=" + str(self.item)
+        return "user:" + str(self.user_id) + ", item:" + str(self.item)
 
 
 

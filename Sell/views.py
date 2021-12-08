@@ -18,7 +18,6 @@ from Utils.item_handler import *
 """
 
 
-
 def sell(request):
     request.session.pop('login_to_continue_to', None)
     args = {"success": False, "message": "", "allowed": is_seller(request.user)}

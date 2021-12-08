@@ -113,19 +113,19 @@ def email_verified(request):
 def verify(request, auth_token):
     request.session.pop('redirect_from_signup', None)
     try:
-        profile_obj = Unverified_User.objects.filter(auth_token=auth_token).first()
+        profile_obj = Unverified_User.objects.get(auth_token=auth_token)
 
         if profile_obj:
-            profile_obj.delete()
-            if is_buyer(profile_obj.user) or is_seller(profile_obj.user):
+            user = User.objects.get(id=profile_obj.user_id)
+            if is_buyer(user) or is_seller(user):
                 return redirect(all_urls["login"])
-            make_buyer(profile_obj.user)
-            profile_obj.save()
+            make_buyer(user)
+            profile_obj.delete()
             return redirect(all_urls["login"])
         else:
             return redirect('/error')
     except Exception as e:
-        return redirect(all_urls["login"])
+        return redirect('/error')
 
 
 def error_page(request):
