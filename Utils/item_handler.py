@@ -141,7 +141,7 @@ def insert_new_item_request(request):
     image_4 = request.FILES["image_4"] if "image_4" in request.FILES else None
     image_5 = request.FILES["image_5"] if "image_5" in request.FILES else None
 
-    validator = FileValidator(max_size=1024 * 1024, content_types=("image/png", "image/jpg", "image/gif"))
+    validator = FileValidator(max_size=1024 * 1024, content_types=("image/png", "image/jpeg", "image/gif"))
     try:
         validator(image_1)
         fp_1 = upload_prod_image_file(image_1, title)

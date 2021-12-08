@@ -222,9 +222,14 @@ def make_seller_request(request):
                 validator(file)
                 try:
                     upload_request_pdf_file(file, user_id=request.user.id)
-                    with connection.cursor() as cursor:
-                        cursor.execute("""INSERT INTO sell_seller_request(buyer_id, message) VALUES (%s, %s)""",
-                                       [str(request.user.id), "Processing"])
+                    if Seller_Request.objects.filter(buyer_id=request.user.id).exists():
+                        with connection.cursor() as cursor:
+                            cursor.execute("""UPDATE sell_seller_request SET message=%s WHERE buyer_id=%s""",
+                                           ["Processing", str(request.user.id)])
+                    else:
+                        with connection.cursor() as cursor:
+                            cursor.execute("""INSERT INTO sell_seller_request(buyer_id, message) VALUES (%s, %s)""",
+                                           [str(request.user.id), "Processing"])
                 except OSError:
                     return [False, "Too Many Requests"]
                 return [True, "Success"]

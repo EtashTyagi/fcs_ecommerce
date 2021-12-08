@@ -24,7 +24,7 @@
      style="background: antiquewhite; min-height:calc(100vh - 156px)">
 <h1 class="mt-4">Seller Requests</h1>
     {% for request in requests %}
-        <form class="my-1 card" style="width: 90%; max-width: 1000px" method="post">
+        <form class="my-1 card shadow-sm" style="width: 90%; max-width: 1000px" method="post">
         {% csrf_token %}
             <div class="card-body">
                 {% for k, v in request.items %}
@@ -34,7 +34,7 @@
             <div class="d-flex flex-column justify-content-center align-items-center w-100 px-2 overflow-hidden">
                 <button style="max-width: 400px" class="btn btn-primary mt-1 mb-3 w-100" type="submit" name="download" value="{{ request.buyer_id }}">Download PDF</button>
                 <button style="max-width: 400px" class="btn btn-success w-100" type="submit" name="response_accept" value="{{ request.req_id }}">Accept</button>
-                <input type="text" class="w-100 mt-3" placeholder="Comments if decline" id="message" name="message" style="max-width: 400px">
+                <label for="message"></label><input type="text" class="w-100 mt-3" placeholder="Comments if decline" id="message" name="message" style="max-width: 400px">
                 <button style="max-width: 400px" class="btn btn-danger mt-1 mb-3 w-100" type="submit" name="response_decline" value="{{ request.req_id }}">Decline</button>
             </div>
         </form>
