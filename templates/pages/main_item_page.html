@@ -25,10 +25,10 @@
      style="min-height:calc(100vh - 156px)">
         <div class="d-flex flex-row card my-3 p-0 pb-2 text-start text-dark radius-5 bg-light
                 shadow item_display item_main border" style="width: 90%; max-width: 1125px;">
-                <div class="shadow-sm m-2 p-1 border rounded d-flex flex-column align-items-center justify-content-center item_first" style="width: 350px; max-width: 350px;background: white; max-height: 465px; min-width: 420px">
+                <div class="shadow-sm m-2 p-1 border rounded d-flex flex-column align-items-center justify-content-center item_first" style="width: 400px;background: white; max-height: 465px;">
                     <img src='{{ item.image_1 }}'
                      class="card-img-top card-img rounded-top bg-dark" height="233px" style="object-fit: contain" id="image" alt="Card image cap">
-                    <div class="w-100 d-flex justify-content-center flex-row my-2" >
+                    <div class="w-100 d-flex justify-content-center flex-row my-2 flex-wrap" >
                         <img src='{{ item.image_1 }}' onclick="switch_to_image(this)"
                          class="card-img-top card-img rounded-2 btn p-0 bg-light" style="max-width: 60px; max-height: 36px;object-fit: contain" id="image1" alt="Card image sm">
                         {% if item.image_2%}
