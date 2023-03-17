@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: fcs_ecommerce_mysql
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DB}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - "./mysql:/var/lib/mysql"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+  web:
+    container_name: fcs_ecommerce_django
+    build: .
+    command: bash -c "python manage.py collectstatic --no-input && python manage.py makemigrations && python manage.py migrate --run-syncdb && gunicorn --workers 3 --bind :80 Main.wsgi:application"
+    restart: unless-stopped
+    environment:
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - MYSQL_DB=${MYSQL_DB}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - "./fcs_ecommerce:/src"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    depends_on:
+      - "db"
+  nginx:
+    image: nginx:latest
+    container_name: fcs_ecommerce_nginx
+    restart: unless-stopped
+    ports:
+      - "8002:80"
+    volumes:
+      - "./config/nginx:/etc/nginx/conf.d"
+      - "./fcs_ecommerce/static:/static"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    depends_on:
+      - "web"
