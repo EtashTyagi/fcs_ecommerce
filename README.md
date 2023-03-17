@@ -18,4 +18,4 @@ Completed
 
 ## Deployed At:
 
-https://shop.etashtyagi.tk/
+https://shop.etashtyagi.in/
